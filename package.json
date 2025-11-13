@@ -17,6 +17,7 @@
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist node_modules/.vite",
+    "setup": "node scripts/setup-automation.js",
     "setup:automation": "node scripts/setup-automation.js",
     "import:excel": "node scripts/importar-excel.js",
     "verify:ai": "node scripts/verify-ai-agent.js",
