@@ -18,11 +18,20 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Timestamp, addDoc, collection, getFirestore } from 'firebase/firestore';
+import {
+  Timestamp,
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getFirestore,
+  updateDoc,
+} from 'firebase/firestore';
 import PropTypes from 'prop-types';
 import { z } from 'zod';
 
 import { Spinner } from '../components/animations/AnimationSystem';
+import { useAuth } from '../components/auth';
 import { Alert, useToast } from '../components/feedback/FeedbackComponents';
 import { Button } from '../components/ui/BaseComponents';
 import {
@@ -67,6 +76,7 @@ export const TransferenciaForm = ({ onSuccess, onCancel, className = '' }) => {
   const [loading, setLoading] = useState(false);
   const toast = useToast();
   const db = getFirestore();
+  const { user, userData } = useAuth();
 
   const {
     register,
@@ -95,6 +105,36 @@ export const TransferenciaForm = ({ onSuccess, onCancel, className = '' }) => {
     try {
       const fecha = Timestamp.fromDate(new Date(data.fecha));
 
+      // Get current balances
+      const bancoOrigenRef = doc(db, 'bancos', data.bancoOrigen);
+      const bancoDestinoRef = doc(db, 'bancos', data.bancoDestino);
+
+      const [bancoOrigenDoc, bancoDestinoDoc] = await Promise.all([
+        getDoc(bancoOrigenRef),
+        getDoc(bancoDestinoRef),
+      ]);
+
+      let saldoOrigen = 0;
+      let saldoDestino = 0;
+
+      if (bancoOrigenDoc.exists()) {
+        saldoOrigen = bancoOrigenDoc.data().saldo || 0;
+      }
+
+      if (bancoDestinoDoc.exists()) {
+        saldoDestino = bancoDestinoDoc.data().saldo || 0;
+      }
+
+      // Validate sufficient balance
+      if (saldoOrigen < data.monto) {
+        toast.error('Saldo insuficiente en el banco origen');
+        setLoading(false);
+        return;
+      }
+
+      const nuevoSaldoOrigen = saldoOrigen - data.monto;
+      const nuevoSaldoDestino = saldoDestino + data.monto;
+
       // Movimiento de salida (banco origen)
       await addDoc(collection(db, 'movimientosBancarios'), {
         folio: `MB-${Date.now()}-OUT`,
@@ -103,13 +143,16 @@ export const TransferenciaForm = ({ onSuccess, onCancel, className = '' }) => {
         tipo: 'transferencia_salida',
         categoria: 'transferencia',
         monto: data.monto,
-        saldo: 0, // TODO: Calcular
+        saldoAnterior: saldoOrigen,
+        saldo: nuevoSaldoOrigen,
         concepto: `TRANSFERENCIA A: ${data.bancoDestino} - ${data.concepto}`,
         referencia: data.referencia || null,
         metodoPago: 'transferencia',
+        bancoDestino: data.bancoDestino,
         notas: data.notas || null,
         createdAt: Timestamp.now(),
-        createdBy: 'current-user',
+        createdBy: user?.uid || 'system',
+        createdByName: userData?.displayName || 'Sistema',
       });
 
       // Movimiento de entrada (banco destino)
@@ -120,14 +163,27 @@ export const TransferenciaForm = ({ onSuccess, onCancel, className = '' }) => {
         tipo: 'transferencia_entrada',
         categoria: 'transferencia',
         monto: data.monto,
-        saldo: 0, // TODO: Calcular
+        saldoAnterior: saldoDestino,
+        saldo: nuevoSaldoDestino,
         concepto: `TRANSFERENCIA DE: ${data.bancoOrigen} - ${data.concepto}`,
         referencia: data.referencia || null,
         metodoPago: 'transferencia',
+        bancoOrigen: data.bancoOrigen,
         notas: data.notas || null,
         createdAt: Timestamp.now(),
-        createdBy: 'current-user',
+        createdBy: user?.uid || 'system',
+        createdByName: userData?.displayName || 'Sistema',
       });
+
+      // Update bank balances
+      await Promise.all([
+        bancoOrigenDoc.exists()
+          ? updateDoc(bancoOrigenRef, { saldo: nuevoSaldoOrigen, updatedAt: Timestamp.now() })
+          : Promise.resolve(),
+        bancoDestinoDoc.exists()
+          ? updateDoc(bancoDestinoRef, { saldo: nuevoSaldoDestino, updatedAt: Timestamp.now() })
+          : Promise.resolve(),
+      ]);
 
       toast.success('Transferencia registrada exitosamente');
       if (onSuccess) onSuccess();

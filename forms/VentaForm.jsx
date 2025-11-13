@@ -21,13 +21,25 @@ import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Timestamp, addDoc, collection, doc, getFirestore, updateDoc } from 'firebase/firestore';
+import {
+  Timestamp,
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  getFirestore,
+  limit,
+  orderBy,
+  query,
+  updateDoc,
+} from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import PropTypes from 'prop-types';
 import { z } from 'zod';
 
 // Components
 import { Spinner } from '../components/animations/AnimationSystem';
+import { useAuth } from '../components/auth';
 import { useToast } from '../components/feedback/FeedbackComponents';
 import { Button } from '../components/ui/BaseComponents';
 import {
@@ -91,8 +103,10 @@ export const VentaForm = ({ ventaId = null, onSuccess, onCancel, className = '' 
   const [loading, setLoading] = useState(false);
   const [clientes, setClientes] = useState([]);
   const [productos, setProductos] = useState([]);
+  const [folioCounter, setFolioCounter] = useState(1);
   const toast = useToast();
   const db = getFirestore();
+  const { user, userData } = useAuth();
 
   // React Hook Form
   const {
@@ -173,20 +187,54 @@ export const VentaForm = ({ ventaId = null, onSuccess, onCancel, className = '' 
   // ============================================================================
 
   useEffect(() => {
-    // TODO: Cargar clientes y productos de Firestore
-    // Por ahora usamos datos mock
-    setClientes([
-      { id: 'cliente-1', nombre: 'Bódega M-P', telefono: '555-0101', saldoPendiente: 15000 },
-      { id: 'cliente-2', nombre: 'Valle', telefono: '555-0102', saldoPendiente: 0 },
-      { id: 'cliente-3', nombre: 'Cliente Premium', telefono: '555-0103', saldoPendiente: 8500 },
-    ]);
+    // Cargar clientes y productos de Firestore
+    const loadData = async () => {
+      try {
+        // Cargar clientes
+        const clientesSnapshot = await getDocs(collection(db, 'clientes'));
+        const clientesData = clientesSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setClientes(clientesData);
 
-    setProductos([
-      { id: 'prod-1', nombre: 'Producto A', codigo: 'PA-001', precio: 6300, stock: 500 },
-      { id: 'prod-2', nombre: 'Producto B', codigo: 'PB-002', precio: 6800, stock: 300 },
-      { id: 'prod-3', nombre: 'Producto C', codigo: 'PC-003', precio: 7200, stock: 200 },
-    ]);
-  }, []);
+        // Cargar productos
+        const productosSnapshot = await getDocs(collection(db, 'productos'));
+        const productosData = productosSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setProductos(productosData);
+
+        // Obtener el último folio para generar el siguiente
+        const ventasSnapshot = await getDocs(
+          query(collection(db, 'ventas'), orderBy('createdAt', 'desc'), limit(1))
+        );
+        if (!ventasSnapshot.empty) {
+          const lastVenta = ventasSnapshot.docs[0].data();
+          const lastFolio = lastVenta.folio || 'V-0';
+          const lastNumber = parseInt(lastFolio.split('-')[1]) || 0;
+          setFolioCounter(lastNumber + 1);
+        }
+      } catch (error) {
+        console.error('Error cargando datos:', error);
+        toast.error('Error al cargar datos. Usando datos de respaldo.');
+        // Fallback a datos mock si falla
+        setClientes([
+          { id: 'cliente-1', nombre: 'Bódega M-P', telefono: '555-0101', saldoPendiente: 15000 },
+          { id: 'cliente-2', nombre: 'Valle', telefono: '555-0102', saldoPendiente: 0 },
+          { id: 'cliente-3', nombre: 'Cliente Premium', telefono: '555-0103', saldoPendiente: 8500 },
+        ]);
+        setProductos([
+          { id: 'prod-1', nombre: 'Producto A', codigo: 'PA-001', precio: 6300, stock: 500 },
+          { id: 'prod-2', nombre: 'Producto B', codigo: 'PB-002', precio: 6800, stock: 300 },
+          { id: 'prod-3', nombre: 'Producto C', codigo: 'PC-003', precio: 7200, stock: 200 },
+        ]);
+      }
+    };
+
+    loadData();
+  }, [db, toast]);
 
   // ============================================================================
   // HANDLERS
@@ -272,7 +320,7 @@ export const VentaForm = ({ ventaId = null, onSuccess, onCancel, className = '' 
 
     try {
       const ventaData = {
-        folio: `V-${Date.now()}`, // TODO: Generar folio secuencial
+        folio: `V-${folioCounter.toString().padStart(6, '0')}`,
         fecha: Timestamp.fromDate(new Date(data.fecha)),
         clienteId: data.clienteId,
         clienteNombre: data.clienteNombre,
@@ -288,11 +336,12 @@ export const VentaForm = ({ ventaId = null, onSuccess, onCancel, className = '' 
         totalPagado: 0,
         saldoPendiente: totales.total,
         estado: 'pendiente',
-        vendedor: data.vendedor || 'Sistema',
+        vendedor: data.vendedor || userData?.displayName || 'Sistema',
         notas: data.notas || '',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
-        createdBy: 'current-user', // TODO: Get from auth
+        createdBy: user?.uid || 'system',
+        createdByName: userData?.displayName || 'Sistema',
       };
 
       if (ventaId) {
