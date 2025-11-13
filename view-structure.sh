@@ -19,7 +19,7 @@ echo "Comando 2: Ver archivos TSX/TS"
 echo "==============================================="
 echo ""
 if [ -d "src" ]; then
-    find src -type f \( -name "*.tsx" -o -name "*.ts" \) | sort
+    find src -follow -type f \( -name "*.tsx" -o -name "*.ts" \) 2>/dev/null | sort
 else
     echo "Note: 'src' directory does not exist. Showing all TSX/TS files in project:"
     find . -type f \( -name "*.tsx" -o -name "*.ts" \) -not -path "*/node_modules/*" -not -path "*/.git/*" | sort
