@@ -1,0 +1,34 @@
+{
+  "name": "chronos-system-automation",
+  "version": "1.0.0",
+  "description": "Complete automation setup for CHRONOS System",
+  "scripts": {
+    "setup:secrets": "gh secret set --repo zoro488/chronos-system",
+    "setup:pages": "gh api repos/zoro488/chronos-system/pages --method POST --field source='{\"branch\":\"gh-pages\",\"path\":\"/\"}'",
+    "setup:protection": "gh api repos/zoro488/chronos-system/branches/main/protection --method PUT --field required_status_checks='{\"strict\":true,\"contexts\":[\"lint\",\"unit-tests\"]}'",
+    "workflows:list": "gh workflow list",
+    "workflows:ci": "gh workflow run ci.yml",
+    "workflows:deploy": "gh workflow run deploy.yml",
+    "workflows:docs": "gh workflow run docs.yml",
+    "issue:create": "gh issue create",
+    "pr:create": "gh pr create",
+    "pr:list": "gh pr list",
+    "run:list": "gh run list --limit 20",
+    "run:view": "gh run view",
+    "check:health": "curl -f https://chronos-system.app/health || echo 'Service down'",
+    "check:staging": "curl -f https://staging.chronos-system.app/health || echo 'Staging down'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zoro488/chronos-system.git"
+  },
+  "keywords": [
+    "automation",
+    "ci-cd",
+    "github-actions",
+    "copilot",
+    "firebase"
+  ],
+  "author": "zoro488",
+  "license": "MIT"
+}

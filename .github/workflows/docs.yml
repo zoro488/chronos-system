@@ -1,0 +1,257 @@
+name: 📚 Documentation Generator
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**/*.ts'
+      - 'src/**/*.tsx'
+      - 'src/**/*.js'
+      - 'src/**/*.jsx'
+      - 'README.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  # ============================================================================
+  # GENERATE API DOCS
+  # ============================================================================
+  api-docs:
+    name: 📖 Generate API Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+      
+      - name: 🎯 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: 📦 Install dependencies
+        run: npm ci
+      
+      - name: 📚 Generate TypeDoc
+        run: |
+          npm install -g typedoc
+          typedoc --out docs/api src/ \
+            --exclude '**/*.test.ts' \
+            --exclude '**/*.spec.ts' \
+            --theme default \
+            --readme README.md
+      
+      - name: 📖 Generate JSDoc
+        run: |
+          npm install -g jsdoc better-docs
+          jsdoc -c jsdoc.json -r src/ -d docs/jsdoc
+      
+      - name: 📦 Upload API Docs
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-docs
+          path: docs/
+
+  # ============================================================================
+  # COMPONENT DOCUMENTATION
+  # ============================================================================
+  component-docs:
+    name: 🎨 Component Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+      
+      - name: 🎯 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: 📦 Install dependencies
+        run: npm ci
+      
+      - name: 🎨 Build Storybook
+        run: |
+          npx storybook build -o docs/storybook
+        continue-on-error: true
+      
+      - name: 📦 Upload Component Docs
+        uses: actions/upload-artifact@v3
+        with:
+          name: component-docs
+          path: docs/storybook/
+
+  # ============================================================================
+  # ARCHITECTURE DIAGRAMS
+  # ============================================================================
+  diagrams:
+    name: 📊 Generate Diagrams
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+      
+      - name: 🎯 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: 📊 Dependency Graph
+        run: |
+          npx madge --image docs/dependency-graph.svg src/
+          npx madge --circular --warning src/
+      
+      - name: 🏗️ Architecture Diagram
+        run: |
+          # Generar diagrama de arquitectura con mermaid o similar
+          cat > docs/architecture.mmd << 'EOF'
+          graph TB
+            A[React App] --> B[Firebase]
+            A --> C[Zustand Store]
+            A --> D[React Query]
+            B --> E[Firestore]
+            B --> F[Auth]
+            B --> G[Storage]
+            C --> H[UI State]
+            D --> I[Server State]
+          EOF
+      
+      - name: 📦 Upload Diagrams
+        uses: actions/upload-artifact@v3
+        with:
+          name: diagrams
+          path: docs/*.{svg,mmd,png}
+
+  # ============================================================================
+  # CHANGELOG
+  # ============================================================================
+  changelog:
+    name: 📝 Generate Changelog
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 📝 Generate Changelog
+        uses: orhun/git-cliff-action@v2
+        with:
+          config: cliff.toml
+          args: --verbose
+        env:
+          OUTPUT: CHANGELOG.md
+      
+      - name: 📤 Commit Changelog
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add CHANGELOG.md
+          git diff --quiet && git diff --staged --quiet || git commit -m "📝 Update CHANGELOG"
+          git push
+
+  # ============================================================================
+  # DEPLOY DOCUMENTATION
+  # ============================================================================
+  deploy-docs:
+    name: 🚀 Deploy Documentation
+    needs: [api-docs, component-docs, diagrams, changelog]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+      
+      - name: 📥 Download API Docs
+        uses: actions/download-artifact@v3
+        with:
+          name: api-docs
+          path: docs-build/api/
+      
+      - name: 📥 Download Component Docs
+        uses: actions/download-artifact@v3
+        with:
+          name: component-docs
+          path: docs-build/components/
+        continue-on-error: true
+      
+      - name: 📥 Download Diagrams
+        uses: actions/download-artifact@v3
+        with:
+          name: diagrams
+          path: docs-build/diagrams/
+      
+      - name: 📝 Create Index
+        run: |
+          cat > docs-build/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="es">
+          <head>
+            <meta charset="UTF-8">
+            <title>CHRONOS System - Documentation</title>
+            <style>
+              body { font-family: system-ui; max-width: 1200px; margin: 50px auto; padding: 20px; }
+              h1 { color: #333; }
+              .card { border: 1px solid #ddd; padding: 20px; margin: 10px 0; border-radius: 8px; }
+              a { color: #0066cc; text-decoration: none; }
+            </style>
+          </head>
+          <body>
+            <h1>📚 CHRONOS System Documentation</h1>
+            
+            <div class="card">
+              <h2>📖 API Documentation</h2>
+              <p>Complete API reference generated from TypeScript/JSDoc comments</p>
+              <a href="api/">View API Docs →</a>
+            </div>
+            
+            <div class="card">
+              <h2>🎨 Component Library</h2>
+              <p>Interactive component documentation with Storybook</p>
+              <a href="components/">View Components →</a>
+            </div>
+            
+            <div class="card">
+              <h2>📊 Architecture Diagrams</h2>
+              <p>System architecture and dependency visualizations</p>
+              <a href="diagrams/">View Diagrams →</a>
+            </div>
+            
+            <div class="card">
+              <h2>📝 Changelog</h2>
+              <p>Version history and release notes</p>
+              <a href="../CHANGELOG.md">View Changelog →</a>
+            </div>
+          </body>
+          </html>
+          EOF
+      
+      - name: 🚀 Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs-build
+          cname: docs.chronos-system.app
+      
+      - name: 💬 Comment Success
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const commits = context.payload.commits || [];
+            const sha = context.sha.substring(0, 7);
+            
+            github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: `📚 Documentation updated and deployed!\n\n🌐 View at: https://docs.chronos-system.app`
+            });

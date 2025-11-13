@@ -1,0 +1,75 @@
+version: 2
+updates:
+  # ============================================================================
+  # NPM DEPENDENCIES
+  # ============================================================================
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "04:00"
+      timezone: "America/Mexico_City"
+    open-pull-requests-limit: 10
+    assignees:
+      - "zoro488"
+    labels:
+      - "dependencies"
+      - "automerge"
+    commit-message:
+      prefix: "⬆️"
+      include: "scope"
+    ignore:
+      # Ignore major version updates for these packages
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+    groups:
+      # Group all Firebase packages together
+      firebase:
+        patterns:
+          - "firebase*"
+      # Group all React Query packages
+      react-query:
+        patterns:
+          - "@tanstack/react-query*"
+      # Group all testing packages
+      testing:
+        patterns:
+          - "*vitest*"
+          - "*playwright*"
+          - "@testing-library/*"
+      # Group all linting/formatting packages
+      dev-tools:
+        patterns:
+          - "eslint*"
+          - "prettier*"
+          - "@typescript-eslint/*"
+
+  # ============================================================================
+  # GITHUB ACTIONS
+  # ============================================================================
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+    labels:
+      - "ci"
+      - "dependencies"
+    commit-message:
+      prefix: "⬆️ CI"
+      include: "scope"
+
+  # ============================================================================
+  # DOCKER (si se usa)
+  # ============================================================================
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "docker"
+      - "dependencies"

@@ -1,0 +1,287 @@
+name: 🚀 Deploy Multi-Environment
+
+on:
+  push:
+    branches:
+      - main      # Production
+      - develop   # Staging
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - production
+          - staging
+          - preview
+
+jobs:
+  # ============================================================================
+  # BUILD
+  # ============================================================================
+  build:
+    name: 🏗️ Build Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🎯 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Build
+        run: npm run build
+        env:
+          NODE_ENV: production
+          VITE_APP_VERSION: ${{ github.sha }}
+
+      - name: 📦 Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  # ============================================================================
+  # DEPLOY TO STAGING
+  # ============================================================================
+  deploy-staging:
+    name: 🚀 Deploy to Staging
+    needs: build
+    if: github.ref == 'refs/heads/develop' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging')
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://staging.chronos-system.app
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📥 Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+      - name: 🔥 Deploy to Firebase Staging
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAGING }}
+          channelId: staging
+          projectId: chronos-staging
+          expires: 30d
+
+      - name: 💬 Comment PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 Deployed to Staging: https://staging.chronos-system.app\n\n✅ Ready for testing!'
+            })
+
+      - name: 🧪 Run Smoke Tests
+        run: |
+          npx wait-on https://staging.chronos-system.app --timeout 60000
+          curl -f https://staging.chronos-system.app/health || exit 1
+
+      - name: 📊 Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: https://staging.chronos-system.app
+          uploadArtifacts: true
+
+  # ============================================================================
+  # DEPLOY TO PRODUCTION
+  # ============================================================================
+  deploy-production:
+    name: 🚀 Deploy to Production
+    needs: build
+    if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://chronos-system.app
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📥 Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+      - name: 🔥 Deploy to Firebase Production
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        id: deploy
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PRODUCTION }}
+          projectId: premium-ecosystem-1760790572
+          channelId: live
+
+      - name: 🧪 Production Health Check
+        run: |
+          npx wait-on https://chronos-system.app --timeout 120000
+          curl -f https://chronos-system.app/health || exit 1
+          echo "✅ Production health check passed"
+
+      - name: 🏷️ Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release v${{ github.run_number }}
+          body: |
+            🚀 **Production Deployment**
+
+            **Commit**: ${{ github.sha }}
+            **Author**: @${{ github.actor }}
+            **Date**: ${{ github.event.head_commit.timestamp }}
+
+            **Changes**:
+            ${{ github.event.head_commit.message }}
+
+            **Deployed to**: https://chronos-system.app
+          draft: false
+          prerelease: false
+
+      - name: 📊 Performance Metrics
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: https://chronos-system.app
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+  # ============================================================================
+  # PREVIEW DEPLOYMENT (for PRs)
+  # ============================================================================
+  deploy-preview:
+    name: 🔍 Deploy Preview
+    needs: build
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📥 Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+      - name: 🔥 Deploy Preview
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        id: deploy
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAGING }}
+          projectId: chronos-staging
+          expires: 7d
+
+      - name: 💬 Comment Preview URL
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🔍 **Preview Deployment Ready!**
+
+              🌐 **URL**: ${{ steps.deploy.outputs.details_url }}
+
+              ⏰ **Expires**: 7 days
+
+              ✅ Ready for review!`
+            })
+
+  # ============================================================================
+  # ROLLBACK (on failure)
+  # ============================================================================
+  rollback:
+    name: ⏪ Rollback on Failure
+    needs: [deploy-production]
+    if: failure() && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🎯 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 🔥 Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: ⏪ Rollback Firebase Hosting
+        run: |
+          firebase use premium-ecosystem-1760790572
+          firebase hosting:rollback --force
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: 💬 Create Issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 Production Deployment Failed - Rollback Executed',
+              body: `Production deployment failed and was rolled back.
+
+              **Run**: ${{ github.run_id }}
+              **Commit**: ${{ github.sha }}
+              **Actor**: @${{ github.actor }}
+
+              Please investigate and fix before attempting another deployment.`,
+              labels: ['bug', 'production', 'urgent']
+            })
+
+  # ============================================================================
+  # POST-DEPLOYMENT TASKS
+  # ============================================================================
+  post-deploy:
+    name: 📊 Post-Deployment Tasks
+    needs: [deploy-production]
+    if: success()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔔 Notify Success
+        run: |
+          echo "✅ Deployment successful!"
+          echo "🌐 URL: https://chronos-system.app"
+
+      - name: 📊 Record Deployment Metrics
+        run: |
+          echo "Recording deployment metrics..."
+          # Aquí puedes enviar métricas a tu sistema de monitoring
+
+      - name: 🧹 Cleanup Old Artifacts
+        uses: c-hive/gha-remove-artifacts@v1
+        with:
+          age: '7 days'
+          skip-recent: 5

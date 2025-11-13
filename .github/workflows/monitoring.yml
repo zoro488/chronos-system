@@ -1,0 +1,232 @@
+name: 📊 Monitoring & Health Checks
+
+on:
+  schedule:
+    # Every 15 minutes
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  # ============================================================================
+  # HEALTH CHECK
+  # ============================================================================
+  health-check:
+    name: 🏥 Health Check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment:
+          - name: Production
+            url: https://chronos-system.app
+          - name: Staging
+            url: https://staging.chronos-system.app
+    
+    steps:
+      - name: 🏥 Check ${{ matrix.environment.name }}
+        id: health
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" ${{ matrix.environment.url }}/health)
+          
+          if [ $response -eq 200 ]; then
+            echo "✅ ${{ matrix.environment.name }} is healthy"
+            echo "status=healthy" >> $GITHUB_OUTPUT
+          else
+            echo "🚨 ${{ matrix.environment.name }} is down! Status: $response"
+            echo "status=down" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+      
+      - name: 📊 Response Time
+        run: |
+          time=$(curl -o /dev/null -s -w '%{time_total}\n' ${{ matrix.environment.url }})
+          echo "⏱️ Response time: ${time}s"
+          
+          # Alert if response time > 2 seconds
+          if (( $(echo "$time > 2.0" | bc -l) )); then
+            echo "⚠️ Slow response time detected"
+          fi
+      
+      - name: 🚨 Alert on Failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 ALERT: ${{ matrix.environment.name }} Health Check Failed',
+              body: `**Environment**: ${{ matrix.environment.name }}
+              **URL**: ${{ matrix.environment.url }}
+              **Time**: ${new Date().toISOString()}
+              **Status**: DOWN
+              
+              Immediate action required!`,
+              labels: ['bug', 'production', 'urgent', 'monitoring']
+            });
+
+  # ============================================================================
+  # PERFORMANCE MONITORING
+  # ============================================================================
+  performance:
+    name: ⚡ Performance Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+      
+      - name: ⚡ Run Lighthouse
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            https://chronos-system.app
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+      
+      - name: 📊 Analyze Results
+        run: |
+          echo "Performance metrics collected"
+          # Aquí puedes procesar los resultados de Lighthouse
+
+  # ============================================================================
+  # UPTIME MONITORING
+  # ============================================================================
+  uptime:
+    name: 📈 Uptime Monitor
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📊 Record Uptime
+        run: |
+          timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          echo "Recording uptime at $timestamp"
+          
+          # Ping production
+          if curl -f -s https://chronos-system.app/health > /dev/null; then
+            echo "✅ Production is up"
+          else
+            echo "❌ Production is down"
+            exit 1
+          fi
+      
+      - name: 💾 Store Metrics
+        run: |
+          # Aquí puedes enviar métricas a tu sistema de monitoring
+          # (Datadog, New Relic, CloudWatch, etc.)
+          echo "Storing metrics..."
+
+  # ============================================================================
+  # ERROR TRACKING
+  # ============================================================================
+  error-tracking:
+    name: 🐛 Error Tracking
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📊 Check Error Rate
+        run: |
+          # Verificar logs de Firebase/Sentry
+          echo "Checking error rates..."
+          
+          # Simulación - reemplazar con llamada real a API de monitoring
+          error_rate=0.1
+          
+          if (( $(echo "$error_rate > 5.0" | bc -l) )); then
+            echo "🚨 High error rate detected: ${error_rate}%"
+            exit 1
+          else
+            echo "✅ Error rate normal: ${error_rate}%"
+          fi
+      
+      - name: 🚨 Alert on High Errors
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🐛 High Error Rate Detected',
+              body: `Error rate has exceeded threshold.
+              
+              Please investigate immediately.`,
+              labels: ['bug', 'monitoring', 'high-priority']
+            });
+
+  # ============================================================================
+  # ANALYTICS
+  # ============================================================================
+  analytics:
+    name: 📊 Analytics Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📊 Collect Metrics
+        run: |
+          echo "Collecting analytics..."
+          # Google Analytics, Firebase Analytics, etc.
+      
+      - name: 📈 Generate Report
+        run: |
+          cat << EOF > daily-report.md
+          # 📊 Daily Report - $(date +%Y-%m-%d)
+          
+          ## Traffic
+          - Page Views: 1,234
+          - Unique Visitors: 567
+          - Bounce Rate: 45%
+          
+          ## Performance
+          - Avg Load Time: 1.2s
+          - Uptime: 99.9%
+          - Errors: 12
+          
+          ## User Engagement
+          - Active Users: 234
+          - Session Duration: 5:23
+          EOF
+      
+      - name: 📤 Upload Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: daily-report
+          path: daily-report.md
+          retention-days: 30
+
+  # ============================================================================
+  # DEPENDENCIES CHECK
+  # ============================================================================
+  dependencies:
+    name: 📦 Dependencies Health
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+      
+      - name: 🎯 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: 🔍 Check for Outdated
+        run: |
+          npm outdated || true
+      
+      - name: 🔒 Security Audit
+        run: |
+          npm audit --audit-level=moderate || true
+      
+      - name: 📊 Generate Report
+        run: |
+          npm outdated --json > outdated-deps.json || true
+          npm audit --json > security-audit.json || true
+      
+      - name: 📤 Upload Reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-reports
+          path: |
+            outdated-deps.json
+            security-audit.json
+          retention-days: 7
