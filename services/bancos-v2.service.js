@@ -193,10 +193,7 @@ export async function crearIngreso(bancoId, data) {
 
     const docRef = await addDoc(collection(db, collections.ingresos), ingreso)
 
-    return {
-      id: docRef.id,
-      ...ingreso
-    }
+    return docRef.id
   } catch (error) {
     console.error('Error creando ingreso:', error)
     throw error
@@ -311,10 +308,7 @@ export async function crearGasto(bancoId, data) {
 
     const docRef = await addDoc(collection(db, collections.gastos), gasto)
 
-    return {
-      id: docRef.id,
-      ...gasto
-    }
+    return docRef.id
   } catch (error) {
     console.error('Error creando gasto:', error)
     throw error
