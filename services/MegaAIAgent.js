@@ -15,18 +15,18 @@
  * - 📤 Exportación avanzada a PDF, Excel, PNG
  */
 import {
-  Timestamp,
-  addDoc,
-  collection,
-  doc,
-  query as firestoreQuery,
-  getDocs,
-  setDoc,
+    Timestamp,
+    addDoc,
+    collection,
+    doc,
+    query as firestoreQuery,
+    getDocs,
+    setDoc,
 } from 'firebase/firestore';
 import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
 
-import { db } from '../../firebase';
+import { db } from '../config/firebase';
 import { UserLearningService } from './UserLearningService';
 
 /**

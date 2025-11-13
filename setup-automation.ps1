@@ -99,14 +99,14 @@ try {
 # 4. Configure Secrets
 if (-not $SkipSecrets) {
     Write-Step "Configurando GitHub Secrets..."
-    
+
     Write-Host "`nNecesitas configurar estos secrets en GitHub:"
     Write-Host "1. FIREBASE_SERVICE_ACCOUNT_STAGING"
     Write-Host "2. FIREBASE_SERVICE_ACCOUNT_PRODUCTION"
     Write-Host "3. FIREBASE_TOKEN"
     Write-Host "4. SLACK_WEBHOOK (opcional)"
     Write-Host "5. SNYK_TOKEN (opcional)"
-    
+
     $response = Read-Host "`n¿Abrir página de secrets en navegador? (Y/n)"
     if ($response -ne 'n') {
         Start-Process "https://github.com/$repo/settings/secrets/actions"

@@ -284,5 +284,5 @@ gh run view <run-id> --log | grep "FAIL"
 
 **¿Necesitas ayuda?** Crea un issue con el label `help-wanted`
 
-**Version**: 1.0.0  
+**Version**: 1.0.0
 **Última actualización**: November 2025

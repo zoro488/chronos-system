@@ -2,8 +2,8 @@
 
 ## 🎉 ¡LISTO! Todo está configurado
 
-**Fecha**: November 2025  
-**Repository**: https://github.com/zoro488/chronos-system  
+**Fecha**: November 2025
+**Repository**: https://github.com/zoro488/chronos-system
 **Status**: ✅ COMPLETADO Y OPERACIONAL
 
 ---
@@ -407,7 +407,7 @@ Has creado un sistema de automatización enterprise-grade con:
 
 ---
 
-**Versión**: 1.0.0  
-**Fecha**: November 2025  
-**Repository**: https://github.com/zoro488/chronos-system  
+**Versión**: 1.0.0
+**Fecha**: November 2025
+**Repository**: https://github.com/zoro488/chronos-system
 **Mantenido por**: @zoro488

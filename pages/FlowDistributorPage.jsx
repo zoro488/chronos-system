@@ -9,20 +9,20 @@ import { useState } from 'react';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Building2,
-  DollarSign,
-  FileText,
-  LayoutDashboard,
-  Settings,
-  ShoppingCart,
-  Upload,
-  UserCircle,
-  Users,
-  Warehouse,
+    Building2,
+    DollarSign,
+    FileText,
+    LayoutDashboard,
+    Settings,
+    ShoppingCart,
+    Upload,
+    UserCircle,
+    Users,
+    Warehouse,
 } from 'lucide-react';
 
 // Importar utilidades
-import { migrarDatosCompletos, verificarMigracion } from '../../utils/migracion-firestore';
+// import { migrarDatosCompletos, verificarMigracion } from '../../utils/migracion-firestore';
 // Importar páginas de módulos
 import BancosPageComplete from './BancosPageComplete';
 import ClientesPage from './ClientesPage';
@@ -104,31 +104,32 @@ export default function FlowDistributorPage() {
   const ModuloComponente = MODULOS.find((m) => m.id === moduloActivo)?.component;
 
   // Verificar estado de migración al cargar
-  useState(() => {
-    verificarMigracion().then(setEstadoMigracion);
-  }, []);
+  // useState(() => {
+  //   verificarMigracion().then(setEstadoMigracion);
+  // }, []);
 
   // Ejecutar migración de datos
   const ejecutarMigracion = async () => {
-    if (
-      confirm(
-        '¿Está seguro de ejecutar la migración de datos? Esto creará todos los registros en Firestore.'
-      )
-    ) {
-      setMigracionEnProceso(true);
-      try {
-        const resultado = await migrarDatosCompletos();
-        alert(
-          `✅ Migración completada:\n- Bancos: ${resultado.bancos}\n- Ventas: ${resultado.ventas}\n- Clientes: ${resultado.clientes}`
-        );
-        const nuevoEstado = await verificarMigracion();
-        setEstadoMigracion(nuevoEstado);
-      } catch (error) {
-        alert(`❌ Error en migración: ${error.message}`);
-      } finally {
-        setMigracionEnProceso(false);
-      }
-    }
+    alert('Función de migración temporalmente deshabilitada');
+    // if (
+    //   confirm(
+    //     '¿Está seguro de ejecutar la migración de datos? Esto creará todos los registros en Firestore.'
+    //   )
+    // ) {
+    //   setMigracionEnProceso(true);
+    //   try {
+    //     const resultado = await migrarDatosCompletos();
+    //     alert(
+    //       `✅ Migración completada:\n- Bancos: ${resultado.bancos}\n- Ventas: ${resultado.ventas}\n- Clientes: ${resultado.clientes}`
+    //     );
+    //     const nuevoEstado = await verificarMigracion();
+    //     setEstadoMigracion(nuevoEstado);
+    //   } catch (error) {
+    //     alert(`❌ Error en migración: ${error.message}`);
+    //   } finally {
+    //     setMigracionEnProceso(false);
+    //   }
+    // }
   };
 
   return (

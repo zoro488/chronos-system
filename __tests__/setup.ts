@@ -12,35 +12,122 @@ afterEach(() => {
   cleanup();
 });
 
-// Mock Firebase
+// Mock Firebase App
+const mockApp = { name: '[DEFAULT]', options: {}, automaticDataCollectionEnabled: false };
+
 vi.mock('firebase/app', () => ({
-  initializeApp: vi.fn(),
-  getApps: vi.fn(() => []),
-  getApp: vi.fn(),
+  initializeApp: vi.fn(() => mockApp),
+  getApps: vi.fn(() => [mockApp]),
+  getApp: vi.fn(() => mockApp),
 }));
 
+// Mock Firebase Firestore
 vi.mock('firebase/firestore', () => ({
-  getFirestore: vi.fn(),
-  collection: vi.fn(),
-  doc: vi.fn(),
-  getDoc: vi.fn(),
-  getDocs: vi.fn(),
-  addDoc: vi.fn(),
-  updateDoc: vi.fn(),
-  deleteDoc: vi.fn(),
-  onSnapshot: vi.fn(),
-  query: vi.fn(),
-  where: vi.fn(),
-  orderBy: vi.fn(),
-  limit: vi.fn(),
+  getFirestore: vi.fn(() => ({})),
+  collection: vi.fn(() => ({})),
+  doc: vi.fn(() => ({ id: 'mock-doc-id' })),
+  getDoc: vi.fn(() => Promise.resolve({
+    exists: () => false,
+    data: () => null,
+    id: 'mock-doc-id'
+  })),
+  getDocs: vi.fn(() => Promise.resolve({
+    docs: [],
+    empty: true,
+    size: 0
+  })),
+  addDoc: vi.fn(() => Promise.resolve({ id: 'mock-new-id' })),
+  updateDoc: vi.fn(() => Promise.resolve()),
+  deleteDoc: vi.fn(() => Promise.resolve()),
+  setDoc: vi.fn(() => Promise.resolve()),
+  onSnapshot: vi.fn(() => vi.fn()),
+  query: vi.fn(() => ({})),
+  where: vi.fn(() => ({})),
+  orderBy: vi.fn(() => ({})),
+  limit: vi.fn(() => ({})),
+  runTransaction: vi.fn((db, callback) => {
+    const transaction = {
+      get: vi.fn(() => Promise.resolve({
+        exists: () => true,
+        data: () => ({ capitalActual: 10000 }),
+        id: 'mock-doc-id'
+      })),
+      set: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    };
+    return callback(transaction);
+  }),
   serverTimestamp: vi.fn(() => new Date()),
+  Timestamp: {
+    now: vi.fn(() => ({ seconds: 1699900000, nanoseconds: 0 })),
+    fromDate: vi.fn((date: Date) => ({
+      seconds: Math.floor(date.getTime() / 1000),
+      nanoseconds: 0
+    })),
+  },
+  enableIndexedDbPersistence: vi.fn(() => Promise.resolve()),
+  disableNetwork: vi.fn(() => Promise.resolve()),
+  enableNetwork: vi.fn(() => Promise.resolve()),
 }));
 
+// Mock Firebase Auth
 vi.mock('firebase/auth', () => ({
-  getAuth: vi.fn(),
+  getAuth: vi.fn(() => ({})),
   signInWithEmailAndPassword: vi.fn(),
   signOut: vi.fn(),
-  onAuthStateChanged: vi.fn(),
+  onAuthStateChanged: vi.fn((auth, callback) => {
+    callback(null);
+    return vi.fn();
+  }),
+}));
+
+// Mock Firebase Storage
+vi.mock('firebase/storage', () => ({
+  getStorage: vi.fn(() => ({})),
+  ref: vi.fn(() => ({})),
+  uploadBytes: vi.fn(() => Promise.resolve({ ref: {} })),
+  getDownloadURL: vi.fn(() => Promise.resolve('https://mock-url.com/file')),
+}));
+
+// Mock Firebase Functions
+vi.mock('firebase/functions', () => ({
+  getFunctions: vi.fn(() => ({})),
+  httpsCallable: vi.fn(() => vi.fn()),
+}));
+
+// Mock Firebase Remote Config
+vi.mock('firebase/remote-config', () => ({
+  getRemoteConfig: vi.fn(() => ({})),
+  fetchAndActivate: vi.fn(() => Promise.resolve(true)),
+  getValue: vi.fn(() => ({ asString: () => '', asNumber: () => 0, asBoolean: () => false })),
+}));
+
+// Mock OpenTelemetry Tracing
+vi.mock('../../../config/tracing.js', () => ({
+  initializeTracing: vi.fn(),
+  shutdownTracing: vi.fn(() => Promise.resolve()),
+  getTracer: vi.fn(() => ({
+    startSpan: vi.fn(() => ({
+      setAttribute: vi.fn(),
+      setStatus: vi.fn(),
+      recordException: vi.fn(),
+      end: vi.fn(),
+    })),
+    startActiveSpan: vi.fn((name, fn) => {
+      const mockSpan = {
+        setAttribute: vi.fn(),
+        setStatus: vi.fn(),
+        recordException: vi.fn(),
+        end: vi.fn(),
+      };
+      return fn(mockSpan);
+    }),
+  })),
+  traceFirestoreOperation: vi.fn((name, fn) => fn()),
+  traceTransaction: vi.fn((name, fn) => fn()),
+  traceComponent: vi.fn((name, fn) => fn()),
+  recordError: vi.fn(),
 }));
 
 // Mock react-hot-toast

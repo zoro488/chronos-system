@@ -36,7 +36,16 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
-export const functions = getFunctions(app);
+
+// Functions es opcional (requiere plan Blaze)
+let functions = null;
+try {
+  functions = getFunctions(app);
+} catch (error) {
+  console.warn('Firebase Functions no disponible (requiere plan Blaze):', error.message);
+}
+export { functions };
+
 export const remoteConfig = getRemoteConfig(app);
 
 // Analytics y Performance (solo en producción)

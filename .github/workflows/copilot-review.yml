@@ -12,92 +12,92 @@ jobs:
   copilot-review:
     name: 🤖 AI Code Review
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 Checkout PR
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-      
+
       - name: 🎯 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-      
+
       - name: 📦 Install dependencies
         run: npm ci
-      
+
       - name: 🔍 Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v40
         with:
           files: |
             src/**/*.{js,jsx,ts,tsx}
-      
+
       - name: 🤖 Analyze Code Quality
         if: steps.changed-files.outputs.any_changed == 'true'
         id: analysis
         run: |
           echo "Changed files:"
           echo "${{ steps.changed-files.outputs.all_changed_files }}"
-          
+
           # Run ESLint on changed files
           npx eslint ${{ steps.changed-files.outputs.all_changed_files }} \
             --format json \
             --output-file eslint-report.json || true
-          
+
           # Run TypeScript type checking
           npx tsc --noEmit || true
-          
+
           # Complexity analysis
           npx complexity-report ${{ steps.changed-files.outputs.all_changed_files }} \
             --format json \
             --output complexity-report.json || true
-      
+
       - name: 🔒 Security Scan
         run: |
           npm audit --json > security-audit.json || true
           npx eslint-plugin-security ${{ steps.changed-files.outputs.all_changed_files }} || true
-      
+
       - name: 📊 Generate Report
         uses: actions/github-script@v6
         with:
           script: |
             const fs = require('fs');
-            
+
             let report = '## 🤖 Copilot Code Review\n\n';
-            
+
             // ESLint Results
             if (fs.existsSync('eslint-report.json')) {
               const eslint = JSON.parse(fs.readFileSync('eslint-report.json', 'utf8'));
               const totalIssues = eslint.reduce((sum, file) => sum + file.errorCount + file.warningCount, 0);
-              
+
               report += '### 🔍 ESLint Analysis\n';
               report += `- **Total Issues**: ${totalIssues}\n`;
               report += `- **Errors**: ${eslint.reduce((sum, f) => sum + f.errorCount, 0)}\n`;
               report += `- **Warnings**: ${eslint.reduce((sum, f) => sum + f.warningCount, 0)}\n\n`;
             }
-            
+
             // Security Audit
             if (fs.existsSync('security-audit.json')) {
               const audit = JSON.parse(fs.readFileSync('security-audit.json', 'utf8'));
               const vulns = audit.metadata?.vulnerabilities || {};
-              
+
               report += '### 🔒 Security Scan\n';
               report += `- **Critical**: ${vulns.critical || 0}\n`;
               report += `- **High**: ${vulns.high || 0}\n`;
               report += `- **Moderate**: ${vulns.moderate || 0}\n`;
               report += `- **Low**: ${vulns.low || 0}\n\n`;
             }
-            
+
             // Recommendations
             report += '### 💡 Recommendations\n';
             report += '- ✅ Code follows project conventions\n';
             report += '- 🧪 Consider adding tests for new features\n';
             report += '- 📝 Update documentation if needed\n';
             report += '- 🔒 No critical security issues detected\n';
-            
+
             // Post comment
             github.rest.issues.createComment({
               issue_number: context.issue.number,
@@ -105,7 +105,7 @@ jobs:
               repo: context.repo.repo,
               body: report
             });
-      
+
       - name: 📦 Upload Analysis Reports
         if: always()
         uses: actions/upload-artifact@v3
@@ -121,11 +121,11 @@ jobs:
     name: 💡 Suggest Improvements
     runs-on: ubuntu-latest
     needs: copilot-review
-    
+
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
-      
+
       - name: 🤖 Generate Suggestions
         uses: actions/github-script@v6
         with:
@@ -139,9 +139,9 @@ jobs:
               '🔒 Validate all user inputs',
               '♿ Ensure accessibility compliance'
             ];
-            
+
             const comment = `## 💡 Copilot Suggestions\n\n${suggestions.map(s => `- ${s}`).join('\n')}`;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,

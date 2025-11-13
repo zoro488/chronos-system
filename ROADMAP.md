@@ -367,6 +367,6 @@
 
 ---
 
-**Última actualización**: November 2025  
-**Versión**: 1.0.0  
+**Última actualización**: November 2025
+**Versión**: 1.0.0
 **Mantenido por**: @zoro488

@@ -21,7 +21,7 @@ jobs:
     name: 🏷️ Auto Label Issues
     runs-on: ubuntu-latest
     if: github.event_name == 'issues' && github.event.action == 'opened'
-    
+
     steps:
       - name: 🤖 Analyze Issue Content
         uses: actions/github-script@v6
@@ -31,50 +31,50 @@ jobs:
             const title = issue.title.toLowerCase();
             const body = (issue.body || '').toLowerCase();
             const content = title + ' ' + body;
-            
+
             let labels = [];
-            
+
             // Bug detection
             if (content.match(/\b(bug|error|crash|broken|fix|issue)\b/)) {
               labels.push('bug');
             }
-            
+
             // Feature detection
             if (content.match(/\b(feature|enhancement|improve|add|new)\b/)) {
               labels.push('enhancement');
             }
-            
+
             // Documentation
             if (content.match(/\b(doc|documentation|readme|guide)\b/)) {
               labels.push('documentation');
             }
-            
+
             // Security
             if (content.match(/\b(security|vulnerability|exploit|xss|sql)\b/)) {
               labels.push('security');
               labels.push('high-priority');
             }
-            
+
             // Performance
             if (content.match(/\b(performance|slow|speed|optimize)\b/)) {
               labels.push('performance');
             }
-            
+
             // Testing
             if (content.match(/\b(test|testing|spec|e2e)\b/)) {
               labels.push('testing');
             }
-            
+
             // UI/UX
             if (content.match(/\b(ui|ux|design|style|css)\b/)) {
               labels.push('ui-ux');
             }
-            
+
             // Priority detection
             if (content.match(/\b(urgent|critical|asap|blocker)\b/)) {
               labels.push('urgent');
             }
-            
+
             // Add labels
             if (labels.length > 0) {
               await github.rest.issues.addLabels({
@@ -84,26 +84,26 @@ jobs:
                 labels: labels
               });
             }
-      
+
       - name: 💬 Welcome Message
         uses: actions/github-script@v6
         with:
           script: |
             const issue = context.payload.issue;
-            
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue.number,
               body: `👋 Thank you for opening this issue!
-              
+
               Your issue has been automatically labeled. A team member will review it soon.
-              
+
               **Next Steps:**
               - ✅ Make sure you've provided all necessary information
               - 📸 Add screenshots if relevant
               - 🔄 Keep an eye on this issue for updates
-              
+
               ---
               💡 **Tip**: Add the \`copilot-agent\` label to have AI assist with implementation!`
             });
@@ -118,36 +118,36 @@ jobs:
       github.event_name == 'issues' &&
       github.event.action == 'labeled' &&
       github.event.label.name == 'copilot-agent'
-    
+
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
-      
+
       - name: 🤖 Assign to Copilot
         uses: actions/github-script@v6
         with:
           script: |
             const issue = context.payload.issue;
-            
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue.number,
               body: `🤖 **Copilot Agent Assigned!**
-              
+
               I'll analyze this issue and create a solution. Here's what I'll do:
-              
+
               1. 📖 Analyze the requirements
               2. 💻 Generate implementation code
               3. 🧪 Add tests
               4. 📝 Update documentation
               5. 🔄 Create a Pull Request
-              
+
               ⏱️ **Estimated time**: 5-10 minutes
-              
+
               I'll notify you when the PR is ready for review!`
             });
-            
+
             // Add "in-progress" label
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
@@ -162,7 +162,7 @@ jobs:
   stale:
     name: 🗑️ Mark Stale Issues
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 🗑️ Stale Action
         uses: actions/stale@v8
@@ -170,13 +170,13 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           stale-issue-message: |
             👋 This issue has been automatically marked as stale because it has not had recent activity.
-            
+
             It will be closed if no further activity occurs within 7 days.
-            
+
             If this issue is still relevant, please comment to keep it open.
           stale-pr-message: |
             👋 This pull request has been automatically marked as stale because it has not had recent activity.
-            
+
             It will be closed if no further activity occurs within 7 days.
           stale-issue-label: 'stale'
           stale-pr-label: 'stale'
@@ -191,28 +191,28 @@ jobs:
     name: ✅ Auto Close on PR Merge
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
-    
+
     steps:
       - name: 🔍 Find Linked Issues
         uses: actions/github-script@v6
         with:
           script: |
             const pr = context.payload.pull_request;
-            
+
             // Extract issue numbers from PR body
             const issueNumbers = (pr.body || '').match(/(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)/gi);
-            
+
             if (issueNumbers) {
               for (const match of issueNumbers) {
                 const issueNumber = parseInt(match.match(/\d+/)[0]);
-                
+
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: issueNumber,
                   body: `✅ Fixed in PR #${pr.number}\n\n🎉 This issue has been resolved and merged into \`${pr.base.ref}\``
                 });
-                
+
                 await github.rest.issues.update({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
@@ -229,7 +229,7 @@ jobs:
     name: 📊 Issue Metrics
     runs-on: ubuntu-latest
     if: github.event_name == 'issues' && github.event.action == 'closed'
-    
+
     steps:
       - name: 📊 Calculate Response Time
         uses: actions/github-script@v6
@@ -239,7 +239,7 @@ jobs:
             const created = new Date(issue.created_at);
             const closed = new Date(issue.closed_at);
             const responseTime = Math.round((closed - created) / (1000 * 60 * 60)); // hours
-            
+
             console.log(`Issue #${issue.number} resolved in ${responseTime} hours`);
-            
+
             // Puedes enviar esto a un sistema de analytics

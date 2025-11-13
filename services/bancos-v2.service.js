@@ -1,413 +1,306 @@
-/**
- * ╔════════════════════════════════════════════════════════════════════════════╗
- * ║                   BANCOS SERVICE V2 - FIRESTORE REAL                       ║
- * ║       Servicio actualizado para usar las colecciones migradas              ║
- * ╚════════════════════════════════════════════════════════════════════════════╝
- *
- * Colecciones Firestore:
- * - {banco}_ingresos: Ingresos de cada banco
- * - {banco}_gastos: Gastos de cada banco
- * - rf_actual: Estado actual con totales
- *
- * Bancos disponibles:
- * - almacen_monte
- * - boveda_monte
- * - boveda_usa
- * - azteca
- * - utilidades
- * - flete_sur
- * - leftie
- * - profit
- */
-import {
-    addDoc,
-    collection,
-    deleteDoc,
-    doc,
-    getDoc,
-    getDocs,
-    limit,
-    onSnapshot,
-    orderBy,
-    query,
-    serverTimestamp,
-    updateDoc
-} from 'firebase/firestore'
-import { db } from '../config/firebase'
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, limit, onSnapshot, orderBy, query, runTransaction, Timestamp, updateDoc, where } from 'firebase/firestore';
+import { traceFirestoreOperation, traceTransaction } from '../../../../config/tracing';
+import { db } from '../config/firebase';
 
-// ==================== MAPEO DE BANCOS ====================
+const BANCOS_COLLECTION = 'bancos';
+const MOVIMIENTOS_COLLECTION = 'movimientosBancarios';
 
-const BANCO_COLLECTIONS = {
-  almacen_monte: 'almacen_monte',
-  boveda_monte: 'boveda_monte',
-  boveda_usa: 'boveda_usa',
-  azteca: 'azteca',
-  utilidades: 'utilidades',
-  flete_sur: 'flete_sur',
-  leftie: 'leftie',
-  profit: 'profit'
-}
-
-const BANCO_NAMES = {
-  almacen_monte: 'Almacén Monte',
-  boveda_monte: 'Bóveda Monte',
-  boveda_usa: 'Bóveda USA',
-  azteca: 'Azteca',
-  utilidades: 'Utilidades',
-  flete_sur: 'Flete Sur',
-  leftie: 'Leftie',
-  profit: 'Profit'
-}
-
-// ==================== HELPERS ====================
-
-function getBancoCollections(bancoId) {
-  const baseCollection = BANCO_COLLECTIONS[bancoId]
-
-  if (!baseCollection) {
-    throw new Error(`Banco inválido: ${bancoId}`)
-  }
-
-  return {
-    ingresos: `${baseCollection}_ingresos`,
-    gastos: `${baseCollection}_gastos`
-  }
-}
-
-// ==================== RF ACTUAL (TOTALES DEL SISTEMA) ====================
+// ===================================================================
+// FUNCIONES BANCARIAS COMPLETAS
+// ===================================================================
 
 /**
- * Obtener estado actual del sistema (RF Actual)
+ * Obtener un banco por ID
  */
-export async function getRFActual() {
+export async function getBanco(bancoId) {
+  return traceFirestoreOperation('getBanco', BANCOS_COLLECTION, async (span) => {
+    try {
+      span.setAttribute('banco.id', bancoId);
+      const docRef = doc(db, BANCOS_COLLECTION, bancoId);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        throw new Error(`Banco ${bancoId} no encontrado`);
+      }
+
+      const result = { id: docSnap.id, ...docSnap.data() };
+      span.setAttribute('banco.nombre', result.nombre);
+      return result;
+    } catch (error) {
+      console.error('Error en getBanco:', error);
+      throw error;
+    }
+  });
+}
+
+/**
+ * Obtener todos los bancos
+ */
+export async function getTodosBancos() {
+  return traceFirestoreOperation('getTodosBancos', BANCOS_COLLECTION, async (span) => {
+    try {
+      const bancosRef = collection(db, BANCOS_COLLECTION);
+      const snapshot = await getDocs(bancosRef);
+      const bancos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      span.setAttribute('bancos.count', bancos.length);
+      return bancos;
+    } catch (error) {
+      console.error('Error en getTodosBancos:', error);
+      throw error;
+    }
+  });
+}
+
+/**
+ * Obtener movimientos bancarios de un banco
+ */
+export async function getMovimientosBancarios(bancoId, filters = {}) {
   try {
-    const docRef = doc(db, 'rf_actual', 'rf_actual')
-    const docSnap = await getDoc(docRef)
+    const movimientosRef = collection(db, MOVIMIENTOS_COLLECTION);
+    let q = query(movimientosRef, where('bancoId', '==', bancoId));
 
-    if (!docSnap.exists()) {
-      return null
+    if (filters.tipo) {
+      q = query(q, where('tipo', '==', filters.tipo));
     }
 
-    return {
-      id: docSnap.id,
-      ...docSnap.data()
-    }
-  } catch (error) {
-    console.error('Error obteniendo RF Actual:', error)
-    throw error
-  }
-}
-
-/**
- * Suscripción en tiempo real a RF Actual
- */
-export function subscribeToRFActual(callback) {
-  const docRef = doc(db, 'rf_actual', 'rf_actual')
-
-  return onSnapshot(docRef, (doc) => {
-    if (doc.exists()) {
-      callback({
-        id: doc.id,
-        ...doc.data()
-      })
+    if (filters.limit) {
+      q = query(q, orderBy('fecha', 'desc'), limit(filters.limit));
     } else {
-      callback(null)
+      q = query(q, orderBy('fecha', 'desc'));
     }
-  }, (error) => {
-    console.error('Error en suscripción RF Actual:', error)
-    callback(null)
-  })
+
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error('Error en getMovimientosBancarios:', error);
+    throw error;
+  }
 }
 
-// ==================== INGRESOS ====================
-
 /**
- * Obtener todos los ingresos de un banco
+ * Obtener transferencias de un banco
  */
-export async function getIngresos(bancoId) {
+export async function getTransferencias(bancoId) {
   try {
-    const collections = getBancoCollections(bancoId)
+    const movimientosRef = collection(db, MOVIMIENTOS_COLLECTION);
     const q = query(
-      collection(db, collections.ingresos),
-      orderBy('Fecha', 'desc')
-    )
+      movimientosRef,
+      where('bancoId', '==', bancoId),
+      where('tipo', 'in', ['TRANSFERENCIA_ENTRADA', 'TRANSFERENCIA_SALIDA']),
+      orderBy('fecha', 'desc')
+    );
 
-    const snapshot = await getDocs(q)
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      // Normalizar fecha
-      fecha: doc.data().Fecha?.toDate?.() || doc.data().fecha?.toDate?.() || new Date(doc.data().Fecha || doc.data().fecha)
-    }))
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
-    console.error(`Error obteniendo ingresos de ${bancoId}:`, error)
-    return []
+    console.error('Error en getTransferencias:', error);
+    throw error;
   }
 }
 
 /**
- * Suscripción en tiempo real a ingresos
+ * Crear transferencia entre bancos (transacción atómica)
  */
-export function subscribeToIngresos(bancoId, callback) {
-  try {
-    const collections = getBancoCollections(bancoId)
-    const q = query(
-      collection(db, collections.ingresos),
-      orderBy('Fecha', 'desc'),
-      limit(100) // Limitar para performance
-    )
+export async function crearTransferencia({ bancoOrigen, bancoDestino, monto, concepto }) {
+  return traceTransaction('crearTransferencia', async () => {
+    try {
+      // 🔒 VALIDACIÓN 1: Todos los campos requeridos
+      if (!bancoOrigen || !bancoDestino || !monto || !concepto) {
+        throw new Error('Todos los campos son requeridos');
+      }
 
-    return onSnapshot(q, (snapshot) => {
-      const ingresos = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        fecha: doc.data().Fecha?.toDate?.() || doc.data().fecha?.toDate?.() || new Date(doc.data().Fecha || doc.data().fecha)
-      }))
-      callback(ingresos)
-    }, (error) => {
-      console.error('Error en suscripción ingresos:', error)
-      callback([])
-    })
-  } catch (error) {
-    console.error('Error configurando suscripción ingresos:', error)
-    return () => {}
-  }
-}
+      // 🔒 VALIDACIÓN 2: Monto debe ser positivo
+      if (monto <= 0) {
+        throw new Error('El monto debe ser mayor a 0');
+      }
 
-/**
- * Crear nuevo ingreso
- */
-export async function crearIngreso(bancoId, data) {
-  try {
-    const collections = getBancoCollections(bancoId)
+      // 🔒 VALIDACIÓN 3: No permitir transferencias al mismo banco
+      if (bancoOrigen === bancoDestino) {
+        throw new Error('No puedes transferir al mismo banco de origen');
+      }
 
-    const ingreso = {
-      ...data,
-      Fecha: data.Fecha || new Date(),
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      source: 'app_web'
+      // Ejecutar transacción atómica
+      return await runTransaction(db, async (transaction) => {
+        const origenRef = doc(db, BANCOS_COLLECTION, bancoOrigen);
+        const destinoRef = doc(db, BANCOS_COLLECTION, bancoDestino);
+
+        const origenSnap = await transaction.get(origenRef);
+        const destinoSnap = await transaction.get(destinoRef);
+
+        if (!origenSnap.exists() || !destinoSnap.exists()) {
+          throw new Error('Uno o ambos bancos no existen');
+        }
+
+        const origenData = origenSnap.data();
+        const destinoData = destinoSnap.data();
+
+        if (origenData.capitalActual < monto) {
+          throw new Error(`Fondos insuficientes. Disponible: $${origenData.capitalActual}, Requerido: $${monto}`);
+        }
+
+        const fecha = Timestamp.now();
+
+        // Crear movimientos
+        const salidaRef = doc(collection(db, MOVIMIENTOS_COLLECTION));
+        const entradaRef = doc(collection(db, MOVIMIENTOS_COLLECTION));
+
+        transaction.set(salidaRef, {
+          bancoId: bancoOrigen,
+          tipo: 'TRANSFERENCIA_SALIDA',
+          monto: -monto,
+          destino: bancoDestino,
+          concepto,
+          fecha,
+          createdAt: fecha,
+        });
+
+        transaction.set(entradaRef, {
+          bancoId: bancoDestino,
+          tipo: 'TRANSFERENCIA_ENTRADA',
+          monto,
+          origen: bancoOrigen,
+          concepto,
+          fecha,
+          createdAt: fecha,
+        });
+
+        // Actualizar saldos
+        transaction.update(origenRef, {
+          capitalActual: origenData.capitalActual - monto,
+          updatedAt: fecha,
+        });
+
+        transaction.update(destinoRef, {
+          capitalActual: destinoData.capitalActual + monto,
+          updatedAt: fecha,
+        });
+
+        return {
+          salidaId: salidaRef.id,
+          entradaId: entradaRef.id,
+        };
+      });
+    } catch (error) {
+      console.error('Error en crearTransferencia:', error);
+      throw error;
     }
-
-    const docRef = await addDoc(collection(db, collections.ingresos), ingreso)
-
-    return {
-      id: docRef.id,
-      ...ingreso
-    }
-  } catch (error) {
-    console.error('Error creando ingreso:', error)
-    throw error
-  }
+  });
 }
 
 /**
- * Actualizar ingreso
+ * Obtener saldo total de todos los bancos
  */
-export async function actualizarIngreso(bancoId, ingresoId, data) {
+export async function getSaldoTotalBancos() {
   try {
-    const collections = getBancoCollections(bancoId)
-    const docRef = doc(db, collections.ingresos, ingresoId)
-
-    await updateDoc(docRef, {
-      ...data,
-      updatedAt: serverTimestamp()
-    })
-
-    return true
+    const bancos = await getTodosBancos();
+    return bancos.reduce((total, banco) => total + (banco.capitalActual || 0), 0);
   } catch (error) {
-    console.error('Error actualizando ingreso:', error)
-    throw error
+    console.error('Error en getSaldoTotalBancos:', error);
+    throw error;
   }
 }
-
-/**
- * Eliminar ingreso
- */
-export async function eliminarIngreso(bancoId, ingresoId) {
-  try {
-    const collections = getBancoCollections(bancoId)
-    const docRef = doc(db, collections.ingresos, ingresoId)
-
-    await deleteDoc(docRef)
-
-    return true
-  } catch (error) {
-    console.error('Error eliminando ingreso:', error)
-    throw error
-  }
-}
-
-// ==================== GASTOS ====================
-
-/**
- * Obtener todos los gastos de un banco
- */
-export async function getGastos(bancoId) {
-  try {
-    const collections = getBancoCollections(bancoId)
-    const q = query(
-      collection(db, collections.gastos),
-      orderBy('Fecha', 'desc')
-    )
-
-    const snapshot = await getDocs(q)
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      fecha: doc.data().Fecha?.toDate?.() || doc.data().fecha?.toDate?.() || new Date(doc.data().Fecha || doc.data().fecha)
-    }))
-  } catch (error) {
-    console.error(`Error obteniendo gastos de ${bancoId}:`, error)
-    return []
-  }
-}
-
-/**
- * Suscripción en tiempo real a gastos
- */
-export function subscribeToGastos(bancoId, callback) {
-  try {
-    const collections = getBancoCollections(bancoId)
-    const q = query(
-      collection(db, collections.gastos),
-      orderBy('Fecha', 'desc'),
-      limit(100)
-    )
-
-    return onSnapshot(q, (snapshot) => {
-      const gastos = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        fecha: doc.data().Fecha?.toDate?.() || doc.data().fecha?.toDate?.() || new Date(doc.data().Fecha || doc.data().fecha)
-      }))
-      callback(gastos)
-    }, (error) => {
-      console.error('Error en suscripción gastos:', error)
-      callback([])
-    })
-  } catch (error) {
-    console.error('Error configurando suscripción gastos:', error)
-    return () => {}
-  }
-}
-
-/**
- * Crear nuevo gasto
- */
-export async function crearGasto(bancoId, data) {
-  try {
-    const collections = getBancoCollections(bancoId)
-
-    const gasto = {
-      ...data,
-      Fecha: data.Fecha || new Date(),
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      source: 'app_web'
-    }
-
-    const docRef = await addDoc(collection(db, collections.gastos), gasto)
-
-    return {
-      id: docRef.id,
-      ...gasto
-    }
-  } catch (error) {
-    console.error('Error creando gasto:', error)
-    throw error
-  }
-}
-
-/**
- * Actualizar gasto
- */
-export async function actualizarGasto(bancoId, gastoId, data) {
-  try {
-    const collections = getBancoCollections(bancoId)
-    const docRef = doc(db, collections.gastos, gastoId)
-
-    await updateDoc(docRef, {
-      ...data,
-      updatedAt: serverTimestamp()
-    })
-
-    return true
-  } catch (error) {
-    console.error('Error actualizando gasto:', error)
-    throw error
-  }
-}
-
-/**
- * Eliminar gasto
- */
-export async function eliminarGasto(bancoId, gastoId) {
-  try {
-    const collections = getBancoCollections(bancoId)
-    const docRef = doc(db, collections.gastos, gastoId)
-
-    await deleteDoc(docRef)
-
-    return true
-  } catch (error) {
-    console.error('Error eliminando gasto:', error)
-    throw error
-  }
-}
-
-// ==================== ESTADÍSTICAS ====================
 
 /**
  * Calcular totales de un banco
  */
 export async function calcularTotalesBanco(bancoId) {
   try {
-    const [ingresos, gastos] = await Promise.all([
-      getIngresos(bancoId),
-      getGastos(bancoId)
-    ])
+    const banco = await getBanco(bancoId);
+    const movimientos = await getMovimientosBancarios(bancoId);
 
-    const totalIngresos = ingresos.reduce((sum, ing) => {
-      const monto = parseFloat(ing.Ingreso || ing.ingreso || ing.Monto || ing.monto || 0)
-      return sum + monto
-    }, 0)
-
-    const totalGastos = gastos.reduce((sum, gas) => {
-      const monto = parseFloat(gas.Gasto || gas.gasto || gas.Monto || gas.monto || 0)
-      return sum + monto
-    }, 0)
+    const totales = movimientos.reduce(
+      (acc, mov) => {
+        switch (mov.tipo) {
+          case 'INGRESO':
+            acc.totalIngresos += mov.monto;
+            break;
+          case 'GASTO':
+            acc.totalGastos += Math.abs(mov.monto);
+            break;
+          case 'TRANSFERENCIA_ENTRADA':
+            acc.totalTransferenciasEntrada += mov.monto;
+            break;
+          case 'TRANSFERENCIA_SALIDA':
+            acc.totalTransferenciasSalida += Math.abs(mov.monto);
+            break;
+        }
+        return acc;
+      },
+      {
+        totalIngresos: 0,
+        totalGastos: 0,
+        totalTransferenciasEntrada: 0,
+        totalTransferenciasSalida: 0,
+      }
+    );
 
     return {
-      totalIngresos,
-      totalGastos,
-      balance: totalIngresos - totalGastos,
-      cantidadIngresos: ingresos.length,
-      cantidadGastos: gastos.length
-    }
+      ...totales,
+      capitalActual: banco.capitalActual,
+      nombreBanco: banco.nombre,
+    };
   } catch (error) {
-    console.error('Error calculando totales:', error)
-    return {
-      totalIngresos: 0,
-      totalGastos: 0,
-      balance: 0,
-      cantidadIngresos: 0,
-      cantidadGastos: 0
-    }
+    console.error('Error en calcularTotalesBanco:', error);
+    throw error;
   }
 }
 
-// ==================== UTILIDADES ====================
+// ===================================================================
+// ALIASES (para compatibilidad)
+// ===================================================================
+export const getCuentasBancarias = getTodosBancos;
+export const getCuentaBancaria = getBanco;
 
-export {
-    BANCO_COLLECTIONS,
-    BANCO_NAMES
-}
+export const createMovimientoBancario = async (data) => {
+  const movimientosRef = collection(db, MOVIMIENTOS_COLLECTION);
+  const docRef = await addDoc(movimientosRef, {
+    ...data,
+    fecha: Timestamp.now(),
+    createdAt: Timestamp.now(),
+  });
+  return { id: docRef.id, ...data };
+};
 
-export function getBancoName(bancoId) {
-  return BANCO_NAMES[bancoId] || bancoId
-}
+export const createCuentaBancaria = async (data) => {
+  const bancosRef = collection(db, BANCOS_COLLECTION);
+  const docRef = await addDoc(bancosRef, {
+    ...data,
+    capitalActual: data.capitalActual || 0,
+    historicoIngresos: 0,
+    historicoGastos: 0,
+    createdAt: Timestamp.now(),
+  });
+  return { id: docRef.id, ...data };
+};
 
-export function getAllBancosIds() {
-  return Object.keys(BANCO_COLLECTIONS)
+export const updateCuentaBancaria = async (bancoId, data) => {
+  const docRef = doc(db, BANCOS_COLLECTION, bancoId);
+  await updateDoc(docRef, { ...data, updatedAt: Timestamp.now() });
+  return { id: bancoId, ...data };
+};
+
+export const deleteMovimientoBancario = async (movimientoId) => {
+  const movimientoRef = doc(db, MOVIMIENTOS_COLLECTION, movimientoId);
+  await deleteDoc(movimientoRef);
+  return { id: movimientoId };
+};
+
+export const deleteCuentaBancaria = async (bancoId) => {
+  const docRef = doc(db, BANCOS_COLLECTION, bancoId);
+  await deleteDoc(docRef);
+  return { id: bancoId };
+};
+
+/**
+ * Suscripción en tiempo real a un banco (RF Actual)
+ */
+export function subscribeToRFActual(bancoId, callback) {
+  const docRef = doc(db, BANCOS_COLLECTION, bancoId);
+  return onSnapshot(docRef, (snapshot) => {
+    if (snapshot.exists()) {
+      callback({ id: snapshot.id, ...snapshot.data() });
+    } else {
+      callback(null);
+    }
+  });
 }

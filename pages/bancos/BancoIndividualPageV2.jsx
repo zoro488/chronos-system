@@ -35,7 +35,8 @@ import { useState } from 'react'
 import { useBanco } from '../../hooks/useBancos-v2'
 
 // Components
-import { Button, Spinner } from '../../components/ui/BaseComponents'
+import { Spinner } from '../../components/animations/AnimationSystem'
+import { Button } from '../../components/ui/BaseComponents'
 
 // ==================== KPI CARD COMPONENT ====================
 function KPICard({ title, value, change, icon: Icon, color, trend }) {

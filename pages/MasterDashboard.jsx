@@ -20,15 +20,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import {
-  Activity,
-  AlertCircle,
-  CreditCard,
-  DollarSign,
-  Package,
-  RefreshCw,
-  ShoppingCart,
-  TrendingUp,
-  Users,
+    Activity,
+    AlertCircle,
+    CreditCard,
+    DollarSign,
+    Package,
+    RefreshCw,
+    ShoppingCart,
+    TrendingUp,
+    Users,
 } from 'lucide-react';
 
 import { MegaAIWidget } from '../components/ai/MegaAIWidget';
@@ -36,9 +36,9 @@ import { MegaAIWidget } from '../components/ai/MegaAIWidget';
 import ChronosKPI from '../components/chronos-ui/ChronosKPI';
 import { ContentSection, PageLayout } from '../components/layout/LayoutComponents';
 import { Button, Card } from '../components/ui/BaseComponents';
-import { BarChart, LineChart } from '../components/ui/DataVisualization';
+// import { BarChart, LineChart } from '../components/ui/DataVisualization';
 import { FormInput } from '../components/ui/FormComponents';
-import { DataTable } from '../components/ui/TableComponents';
+// import { DataTable } from '../components/ui/TableComponents';
 import { useCollection } from '../hooks/useFirestore';
 import { toast } from '../stores/useChronosStore';
 
@@ -445,26 +445,36 @@ export const MasterDashboard = () => {
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ContentSection title="Ventas Últimos 30 Días">
-            <LineChart
+            <div className="text-center text-gray-500 py-8">
+              Gráficos temporalmente deshabilitados (BarChart/LineChart no exportados desde DataVisualization)
+            </div>
+            {/* <LineChart
               data={chartData.ventasUltimos30Dias}
               xKey="fecha"
               yKey="ventas"
               height={300}
-            />
+            /> */}
           </ContentSection>
 
           <ContentSection title="Top 5 Productos Vendidos">
-            <BarChart data={chartData.topProductos} xKey="producto" yKey="cantidad" height={300} />
+            <div className="text-center text-gray-500 py-8">
+              Gráficos temporalmente deshabilitados
+            </div>
+            {/* <BarChart data={chartData.topProductos} xKey="producto" yKey="cantidad" height={300} /> */}
           </ContentSection>
         </div>
 
         <ContentSection title="Top 5 Clientes">
-          <BarChart data={chartData.topClientes} xKey="cliente" yKey="total" height={300} />
+          <div className="text-center text-gray-500 py-8">
+            Gráficos temporalmente deshabilitados
+          </div>
+          {/* <BarChart data={chartData.topClientes} xKey="cliente" yKey="total" height={300} /> */}
         </ContentSection>
 
         {/* Últimas Transacciones */}
         <ContentSection title="Últimas Transacciones">
-          <DataTable data={ultimasTransacciones} columns={transaccionesColumns} loading={loading} />
+          {/* <DataTable data={ultimasTransacciones} columns={transaccionesColumns} loading={loading} /> */}
+          <div className="text-center text-gray-500 py-8">Componente DataTable temporalmente deshabilitado</div>
         </ContentSection>
       </div>
 

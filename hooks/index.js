@@ -9,73 +9,66 @@
 
 // Ventas
 export {
-  useCancelVenta,
-  useCreateVenta,
-  useDeleteVenta,
-  useRegistrarPagoParcial,
-  useUpdateVenta,
-  useVenta,
-  useVentas,
-  useVentasByCliente,
-  useVentasByMonth,
-  useVentasStats,
+    useCancelVenta,
+    useCreateVenta,
+    useDeleteVenta,
+    useRegistrarPagoParcial,
+    useUpdateVenta,
+    useVenta,
+    useVentas,
+    useVentasByCliente,
+    useVentasByMonth,
+    useVentasStats
 } from './useVentas';
 
 // Clientes
 export {
-  useCliente,
-  useClientes,
-  useCreateCliente,
-  useDeleteCliente,
-  useSearchClientes,
-  useUpdateCliente,
+    useCliente,
+    useClientes,
+    useCreateCliente,
+    useDeleteCliente,
+    useSearchClientes,
+    useUpdateCliente
 } from './useClientes';
 
 // Productos
 export {
-  useAjusteInventario,
-  useCreateProducto,
-  useDeleteProducto,
-  useProducto,
-  useProductos,
-  useProductosByCategoria,
-  useProductosLowStock,
-  useUpdateProducto,
+    useAjusteInventario,
+    useCreateProducto,
+    useDeleteProducto,
+    useProducto,
+    useProductos,
+    useProductosByCategoria,
+    useProductosLowStock,
+    useUpdateProducto
 } from './useProductos';
 
 // Compras
 export {
-  useCancelCompra,
-  useCompra,
-  useCompras,
-  useComprasByProveedor,
-  useCreateCompra,
-  useDeleteCompra,
-  useRecibirCompra,
-  useUpdateCompra,
+    useCancelCompra,
+    useCompra,
+    useCompras,
+    useComprasByProveedor,
+    useCreateCompra,
+    useDeleteCompra,
+    useRecibirCompra,
+    useUpdateCompra
 } from './useCompras';
 
 // Bancos
 export {
-  useCreateCuentaBancaria,
-  useCreateMovimientoBancario,
-  useCuentaBancaria,
-  useCuentasBancarias,
-  useDeleteCuentaBancaria,
-  useDeleteMovimientoBancario,
-  useMovimientosBancarios,
-  useSaldoTotalBancos,
-  useUpdateCuentaBancaria,
+    useBanco, useBancoRealtime, useBancos, useCrearTransferencia, useMovimientosBancarios, useSaldoTotal,
+    useTotalesBanco, useTransferencias
 } from './useBancos';
 
 // Gastos
 export {
-  useCreateGasto,
-  useDeleteGasto,
-  useGasto,
-  useGastos,
-  useGastosByCategoria,
-  useGastosByMonth,
-  useGastosStats,
-  useUpdateGasto,
+    useCreateGasto,
+    useDeleteGasto,
+    useGasto,
+    useGastos,
+    useGastosByCategoria,
+    useGastosByMonth,
+    useGastosStats,
+    useUpdateGasto
 } from './useGastos';

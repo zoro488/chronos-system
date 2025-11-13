@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as bancosService from '../../services/bancos-v2.service';
-import { mockBancos } from '../fixtures/data';
+import { mockBancos, mockMovimientos } from '../fixtures/data';
 
 // Mock Firebase
 vi.mock('../../config/firebase', () => ({
@@ -15,7 +15,6 @@ vi.mock('firebase/firestore', () => ({
   getDocs: vi.fn(),
   addDoc: vi.fn(),
   updateDoc: vi.fn(),
-  deleteDoc: vi.fn(),
   query: vi.fn(),
   where: vi.fn(),
   orderBy: vi.fn(),
@@ -30,27 +29,29 @@ vi.mock('../../config/tracing', () => ({
   trace: vi.fn((name, fn) => fn()),
 }));
 
-describe('🧪 Bancos Service - Tests Completos', () => {
+describe('🧪 Transferencias/Bancos Service - Tests Completos', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('✅ getTodosBancos está definido', () => {
-    expect(bancosService.getTodosBancos).toBeDefined();
-    expect(typeof bancosService.getTodosBancos).toBe('function');
+  it('✅ crearTransferencia está definido', () => {
+    expect(bancosService.crearTransferencia).toBeDefined();
+    expect(typeof bancosService.crearTransferencia).toBe('function');
   });
 
   it('✅ Mock data de bancos es válido', () => {
     expect(mockBancos).toBeDefined();
     expect(mockBancos.length).toBeGreaterThan(0);
-  });
 
-  it('✅ Banco tiene estructura válida', () => {
     const banco = mockBancos[0];
     expect(banco).toHaveProperty('id');
     expect(banco).toHaveProperty('nombre');
     expect(banco).toHaveProperty('capitalActual');
-    expect(typeof banco.capitalActual).toBe('number');
+  });
+
+  it('✅ Mock data de movimientos es válido', () => {
+    expect(mockMovimientos).toBeDefined();
+    expect(mockMovimientos.length).toBeGreaterThan(0);
   });
 
   it('✅ Estructura del servicio es correcta', () => {
@@ -58,6 +59,5 @@ describe('🧪 Bancos Service - Tests Completos', () => {
     expect(bancosService).toHaveProperty('getBanco');
     expect(bancosService).toHaveProperty('crearTransferencia');
     expect(bancosService).toHaveProperty('getMovimientosBancarios');
-    expect(bancosService).toHaveProperty('getSaldoTotalBancos');
   });
 });

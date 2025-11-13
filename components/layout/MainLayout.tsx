@@ -17,6 +17,7 @@ import { useLocation } from 'react-router-dom';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
+import { MegaAIWidget } from '../ai/MegaAIWidget';
 import UltraHeaderComplete from './UltraHeaderComplete';
 import UltraSidebarComplete from './UltraSidebarComplete';
 
@@ -123,6 +124,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
           />
         )}
       </AnimatePresence>
+
+      {/* MEGA AI WIDGET - Asistente Flotante */}
+      <MegaAIWidget userId="current-user" position="bottom-right" />
     </div>
   );
 }
