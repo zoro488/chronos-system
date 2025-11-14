@@ -69,7 +69,7 @@ export default function SplashScreen({
         initial={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5 }}
-        className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-purple-900/20 via-slate-900 to-slate-950"
+        className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-blue-900/20 via-slate-900 to-slate-950"
       >
         {/* Background Effects */}
         <div className="absolute inset-0 overflow-hidden">
@@ -85,7 +85,7 @@ export default function SplashScreen({
               repeat: Infinity,
               ease: 'linear',
             }}
-            className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-purple-500/30 blur-3xl"
+            className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-blue-500/30 blur-3xl"
           />
           <motion.div
             animate={{
@@ -98,7 +98,7 @@ export default function SplashScreen({
               repeat: Infinity,
               ease: 'linear',
             }}
-            className="absolute -bottom-40 -right-40 h-80 w-80 rounded-full bg-pink-500/30 blur-3xl"
+            className="absolute -bottom-40 -right-40 h-80 w-80 rounded-full bg-cyan-500/30 blur-3xl"
           />
 
           {/* Grid pattern */}
@@ -153,7 +153,7 @@ export default function SplashScreen({
                 transition={{ duration: 0.3 }}
               >
                 {/* Gradient fill */}
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-cyan-500 to-purple-500" />
 
                 {/* Animated shine effect */}
                 <motion.div
@@ -169,7 +169,7 @@ export default function SplashScreen({
                 />
 
                 {/* Glow effect */}
-                <div className="absolute inset-0 blur-sm bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
+                <div className="absolute inset-0 blur-sm bg-gradient-to-r from-purple-500 via-cyan-500 to-purple-500" />
               </motion.div>
             </div>
 
@@ -210,7 +210,7 @@ export default function SplashScreen({
           {[...Array(30)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute h-1 w-1 rounded-full bg-purple-400/30"
+              className="absolute h-1 w-1 rounded-full bg-blue-400/30"
               initial={{
                 x: Math.random() * window.innerWidth,
                 y: window.innerHeight + 10,
@@ -258,14 +258,14 @@ export function MiniSplash({ message = 'Cargando...' }: MiniSplashProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple-900/20 via-slate-900 to-slate-950"
+      className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-900/20 via-slate-900 to-slate-950"
     >
       <div className="text-center">
         {/* Spinner */}
         <div className="relative mx-auto mb-4 h-16 w-16">
-          <div className="absolute inset-0 rounded-full border-4 border-purple-500/20" />
+          <div className="absolute inset-0 rounded-full border-4 border-blue-500/20" />
           <motion.div
-            className="absolute inset-0 rounded-full border-4 border-purple-500 border-t-transparent"
+            className="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent"
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
           />

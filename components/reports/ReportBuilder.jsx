@@ -151,7 +151,7 @@ export default function ReportBuilder({ onGenerate, onClose }) {
                       : 'rgb(229, 231, 235)',
                 }}
                 className={`flex h-12 w-12 items-center justify-center rounded-full text-white ${
-                  currentStep >= step.id ? 'bg-purple-500' : 'bg-gray-300'
+                  currentStep >= step.id ? 'bg-blue-500' : 'bg-gray-300'
                 }`}
               >
                 {currentStep > step.id ? (
@@ -163,7 +163,7 @@ export default function ReportBuilder({ onGenerate, onClose }) {
               <p className="mt-2 text-xs font-medium">{step.title}</p>
             </div>
             {index < STEPS.length - 1 && (
-              <div className={`h-1 flex-1 ${currentStep > step.id ? 'bg-purple-500' : 'bg-gray-300'}`} />
+              <div className={`h-1 flex-1 ${currentStep > step.id ? 'bg-blue-500' : 'bg-gray-300'}`} />
             )}
           </div>
         ))}
@@ -190,11 +190,11 @@ export default function ReportBuilder({ onGenerate, onClose }) {
                 onClick={() => setConfig({ ...config, type: type.id })}
                 className={`rounded-lg border-2 p-6 text-left transition-all ${
                   config.type === type.id
-                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                    : 'border-gray-200 hover:border-purple-300 dark:border-gray-800'
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                    : 'border-gray-200 hover:border-blue-300 dark:border-gray-800'
                 }`}
               >
-                <type.icon className={`mb-3 h-8 w-8 ${config.type === type.id ? 'text-purple-600' : 'text-gray-400'}`} />
+                <type.icon className={`mb-3 h-8 w-8 ${config.type === type.id ? 'text-blue-600' : 'text-gray-400'}`} />
                 <h3 className="mb-1 font-semibold">{type.name}</h3>
                 <p className="text-sm text-gray-500">{type.description}</p>
               </motion.button>
@@ -213,11 +213,11 @@ export default function ReportBuilder({ onGenerate, onClose }) {
                   onClick={() => setConfig({ ...config, period: period.id })}
                   className={`flex items-center gap-3 rounded-lg border-2 p-4 transition-all ${
                     config.period === period.id
-                      ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                      : 'border-gray-200 hover:border-purple-300 dark:border-gray-800'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                      : 'border-gray-200 hover:border-blue-300 dark:border-gray-800'
                   }`}
                 >
-                  <period.icon className={`h-6 w-6 ${config.period === period.id ? 'text-purple-600' : 'text-gray-400'}`} />
+                  <period.icon className={`h-6 w-6 ${config.period === period.id ? 'text-blue-600' : 'text-gray-400'}`} />
                   <span className="font-medium">{period.name}</span>
                 </motion.button>
               ))}
@@ -272,13 +272,13 @@ export default function ReportBuilder({ onGenerate, onClose }) {
                 onClick={() => toggleMetric(metric)}
                 className={`flex items-center justify-between rounded-lg border-2 p-4 transition-all ${
                   config.metrics.includes(metric)
-                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                    : 'border-gray-200 hover:border-purple-300 dark:border-gray-800'
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                    : 'border-gray-200 hover:border-blue-300 dark:border-gray-800'
                 }`}
               >
                 <span className="font-medium">{metric}</span>
                 {config.metrics.includes(metric) && (
-                  <CheckCircle className="h-5 w-5 text-purple-600" />
+                  <CheckCircle className="h-5 w-5 text-blue-600" />
                 )}
               </motion.button>
             ))}
@@ -295,11 +295,11 @@ export default function ReportBuilder({ onGenerate, onClose }) {
                 onClick={() => setConfig({ ...config, visualization: viz.id })}
                 className={`rounded-lg border-2 p-6 text-left transition-all ${
                   config.visualization === viz.id
-                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                    : 'border-gray-200 hover:border-purple-300 dark:border-gray-800'
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                    : 'border-gray-200 hover:border-blue-300 dark:border-gray-800'
                 }`}
               >
-                <viz.icon className={`mb-3 h-8 w-8 ${config.visualization === viz.id ? 'text-purple-600' : 'text-gray-400'}`} />
+                <viz.icon className={`mb-3 h-8 w-8 ${config.visualization === viz.id ? 'text-blue-600' : 'text-gray-400'}`} />
                 <h3 className="mb-1 font-semibold">{viz.name}</h3>
                 <p className="text-sm text-gray-500">{viz.description}</p>
               </motion.button>
@@ -317,11 +317,11 @@ export default function ReportBuilder({ onGenerate, onClose }) {
                 onClick={() => setConfig({ ...config, format: format.id })}
                 className={`rounded-lg border-2 p-6 text-left transition-all ${
                   config.format === format.id
-                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                    : 'border-gray-200 hover:border-purple-300 dark:border-gray-800'
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                    : 'border-gray-200 hover:border-blue-300 dark:border-gray-800'
                 }`}
               >
-                <format.icon className={`mb-3 h-8 w-8 ${config.format === format.id ? 'text-purple-600' : 'text-gray-400'}`} />
+                <format.icon className={`mb-3 h-8 w-8 ${config.format === format.id ? 'text-blue-600' : 'text-gray-400'}`} />
                 <h3 className="mb-1 font-semibold">{format.name}</h3>
                 <p className="text-sm text-gray-500">{format.description}</p>
               </motion.button>
@@ -345,7 +345,7 @@ export default function ReportBuilder({ onGenerate, onClose }) {
           disabled={!isStepValid()}
           className={`flex items-center gap-2 rounded-lg px-6 py-3 font-medium text-white transition-all ${
             isStepValid()
-              ? 'bg-gradient-to-r from-purple-500 to-blue-500 hover:shadow-lg'
+              ? 'bg-gradient-to-r from-blue-500 to-blue-500 hover:shadow-lg'
               : 'cursor-not-allowed bg-gray-300'
           }`}
         >

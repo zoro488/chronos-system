@@ -36,7 +36,7 @@ interface MetricCardProps {
   changeLabel?: string;
   icon?: React.ReactNode;
   trend?: 'up' | 'down' | 'neutral';
-  color?: 'purple' | 'blue' | 'green' | 'yellow' | 'red' | 'pink';
+  color?: 'cyan' | 'blue' | 'green' | 'yellow' | 'red' | 'teal';
   loading?: boolean;
   className?: string;
   onClick?: () => void;
@@ -49,17 +49,17 @@ export function MetricCard({
   changeLabel,
   icon,
   trend,
-  color = 'purple',
+  color = 'blue',
   loading = false,
   className,
   onClick,
 }: MetricCardProps) {
   const colorClasses = {
-    purple: {
-      bg: 'from-purple-500/20 to-pink-500/20',
-      border: 'border-purple-500/30',
-      icon: 'bg-purple-500/20 text-purple-400',
-      glow: 'shadow-purple-500/20',
+    cyan: {
+      bg: 'from-cyan-500/20 to-blue-500/20',
+      border: 'border-cyan-500/30',
+      icon: 'bg-cyan-500/20 text-cyan-400',
+      glow: 'shadow-cyan-500/20',
     },
     blue: {
       bg: 'from-blue-500/20 to-cyan-500/20',
@@ -80,16 +80,16 @@ export function MetricCard({
       glow: 'shadow-yellow-500/20',
     },
     red: {
-      bg: 'from-red-500/20 to-pink-500/20',
+      bg: 'from-red-500/20 to-cyan-500/20',
       border: 'border-red-500/30',
       icon: 'bg-red-500/20 text-red-400',
       glow: 'shadow-red-500/20',
     },
-    pink: {
-      bg: 'from-pink-500/20 to-purple-500/20',
-      border: 'border-pink-500/30',
-      icon: 'bg-pink-500/20 text-pink-400',
-      glow: 'shadow-pink-500/20',
+    teal: {
+      bg: 'from-teal-500/20 to-cyan-500/20',
+      border: 'border-teal-500/30',
+      icon: 'bg-teal-500/20 text-teal-400',
+      glow: 'shadow-teal-500/20',
     },
   };
 
@@ -299,7 +299,7 @@ interface ProgressRingProps {
   max?: number;
   size?: number;
   strokeWidth?: number;
-  color?: 'purple' | 'blue' | 'green' | 'yellow' | 'red';
+  color?: 'cyan' | 'blue' | 'green' | 'yellow' | 'red';
   label?: string;
   showPercentage?: boolean;
   className?: string;
@@ -310,7 +310,7 @@ export function ProgressRing({
   max = 100,
   size = 120,
   strokeWidth = 8,
-  color = 'purple',
+  color = 'blue',
   label,
   showPercentage = true,
   className,
@@ -321,7 +321,7 @@ export function ProgressRing({
   const offset = circumference - (percentage / 100) * circumference;
 
   const colorClasses = {
-    purple: 'stroke-purple-500',
+    cyan: 'stroke-cyan-500',
     blue: 'stroke-blue-500',
     green: 'stroke-green-500',
     yellow: 'stroke-yellow-500',

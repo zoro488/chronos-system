@@ -92,8 +92,8 @@ const QUICK_ACTIONS = [
     id: 'transfer',
     icon: Repeat,
     label: 'Transferencia',
-    color: 'purple',
-    gradient: 'from-purple-500 to-purple-600',
+    color: 'blue',
+    gradient: 'from-blue-500 to-blue-600',
     shortcut: 'Ctrl+T',
     hasDropdown: true,
   },
@@ -265,7 +265,7 @@ export default function UltraHeaderComplete({ onMenuToggle, onActionClick }) {
   return (
     <>
       <motion.header
-        className="fixed top-0 right-0 left-0 h-18 bg-gradient-to-r from-slate-900/95 via-purple-900/10 to-slate-900/95 backdrop-blur-2xl border-b border-white/10 z-40 shadow-2xl"
+        className="fixed top-0 right-0 left-0 h-18 bg-gradient-to-r from-slate-900/95 via-blue-900/10 to-slate-900/95 backdrop-blur-2xl border-b border-white/10 z-40 shadow-2xl"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -293,7 +293,7 @@ export default function UltraHeaderComplete({ onMenuToggle, onActionClick }) {
             >
               <div className="text-3xl">💎</div>
               <div className="hidden md:block">
-                <h1 className="text-lg font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <h1 className="text-lg font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-cyan-400 bg-clip-text text-transparent">
                   FlowDistributor
                 </h1>
                 <p className="text-xs text-gray-400">Sistema Empresarial</p>
@@ -319,7 +319,7 @@ export default function UltraHeaderComplete({ onMenuToggle, onActionClick }) {
                       onClick={() => navigate(crumb.path)}
                       className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${
                         crumb.active
-                          ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-white font-medium'
+                          ? 'bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-white font-medium'
                           : 'text-gray-400 hover:text-white hover:bg-white/5'
                       }`}
                       whileHover={{ scale: 1.05 }}
@@ -454,7 +454,7 @@ export default function UltraHeaderComplete({ onMenuToggle, onActionClick }) {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center font-bold">
                   A
                 </div>
                 <span className="hidden md:inline text-sm font-medium">Admin</span>
@@ -566,14 +566,14 @@ function NotificationsDropdownComplete({ onClose }) {
             onClick={() => setActiveTab(tab.id)}
             className={`flex-1 flex items-center justify-center gap-2 py-3 transition-colors ${
               activeTab === tab.id
-                ? 'bg-purple-500/20 text-white border-b-2 border-purple-500'
+                ? 'bg-blue-500/20 text-white border-b-2 border-blue-500'
                 : 'text-gray-400 hover:bg-white/5'
             }`}
           >
             <tab.icon size={16} />
             <span className="text-sm font-medium">{tab.label}</span>
             {tab.count > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-purple-500 text-white text-xs font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-blue-500 text-white text-xs font-bold">
                 {tab.count}
               </span>
             )}
@@ -603,7 +603,7 @@ function NotificationsDropdownComplete({ onClose }) {
 
       {/* Footer */}
       <div className="p-3 border-t border-white/10 flex gap-2">
-        <button className="flex-1 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 text-white text-sm font-medium transition-colors">
+        <button className="flex-1 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition-colors">
           Ver todas
         </button>
         <button className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-colors">
@@ -659,15 +659,15 @@ function ProfileDropdownComplete({ onClose }) {
       exit={{ opacity: 0, y: -10 }}
     >
       {/* Header con Avatar */}
-      <div className="p-6 bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-b border-white/10">
+      <div className="p-6 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border-b border-white/10">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-2xl">
+          <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-2xl">
             A
           </div>
           <div>
             <h3 className="text-white font-bold">Admin User</h3>
             <p className="text-gray-300 text-sm">admin@flowdistributor.com</p>
-            <p className="text-purple-400 text-xs mt-1">Administrador</p>
+            <p className="text-cyan-400 text-xs mt-1">Administrador</p>
           </div>
         </div>
       </div>
@@ -696,7 +696,7 @@ function ProfileDropdownComplete({ onClose }) {
                 <item.icon size={18} />
                 <span className="flex-1 text-sm font-medium">{item.label}</span>
                 {item.toggle && (
-                  <div className="w-10 h-6 rounded-full bg-purple-500 flex items-center px-1">
+                  <div className="w-10 h-6 rounded-full bg-blue-500 flex items-center px-1">
                     <div className="w-4 h-4 rounded-full bg-white" />
                   </div>
                 )}
@@ -771,8 +771,8 @@ function SearchGlobalModal({ query, setQuery, onClose, searchRef }) {
                 className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/10 transition-colors text-left"
                 whileHover={{ x: 4 }}
               >
-                <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                  <FileText size={20} className="text-purple-400" />
+                <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                  <FileText size={20} className="text-cyan-400" />
                 </div>
                 <div className="flex-1">
                   <h4 className="text-white font-medium">{result.title}</h4>

@@ -152,7 +152,7 @@ export default function VoiceInput({ onTranscript, onError, className }) {
                   repeat: Infinity,
                   ease: 'easeInOut',
                 }}
-                className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"
+                className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-blue-500"
               />
               <motion.div
                 animate={{
@@ -165,11 +165,11 @@ export default function VoiceInput({ onTranscript, onError, className }) {
                   ease: 'easeInOut',
                   delay: 0.5,
                 }}
-                className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"
+                className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-blue-500"
               />
 
               {/* Mic Icon */}
-              <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-blue-500 shadow-2xl">
+              <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-blue-500 shadow-2xl">
                 <Mic className="h-12 w-12 text-white" />
               </div>
             </motion.div>
@@ -233,7 +233,7 @@ export default function VoiceInput({ onTranscript, onError, className }) {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={startListening}
-            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-6 py-3 font-medium text-white shadow-lg hover:shadow-xl"
+            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-500 px-6 py-3 font-medium text-white shadow-lg hover:shadow-xl"
           >
             <Circle className="h-4 w-4 animate-pulse" />
             Iniciar Grabación

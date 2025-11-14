@@ -83,11 +83,11 @@ const ChronosKPI = ({
       text: 'text-neon-cyan',
       glow: 'shadow-neon-cyan/20',
     },
-    purple: {
-      border: 'border-neon-purple/30',
-      bg: 'bg-neon-purple/10',
-      text: 'text-neon-purple',
-      glow: 'shadow-neon-purple/20',
+    blue: {
+      border: 'border-neon-blue/30',
+      bg: 'bg-neon-blue/10',
+      text: 'text-neon-blue',
+      glow: 'shadow-neon-blue/20',
     },
     green: {
       border: 'border-neon-green/30',
@@ -224,7 +224,7 @@ ChronosKPI.propTypes = {
   /** Tendencia en porcentaje (positivo/negativo) */
   trend: PropTypes.number,
   /** Variante de color */
-  color: PropTypes.oneOf(['cyan', 'purple', 'green', 'yellow', 'red']),
+  color: PropTypes.oneOf(['cyan', 'blue', 'green', 'yellow', 'red']),
   /** Ícono de Lucide React */
   icon: PropTypes.elementType,
   /** Tamaño del KPI */

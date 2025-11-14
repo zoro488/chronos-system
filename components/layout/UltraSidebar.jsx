@@ -145,7 +145,7 @@ export default function UltraSidebar({ onCollapse }) {
                 exit={{ opacity: 0, x: -20 }}
                 className="flex items-center gap-3"
               >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xl">
                   C
                 </div>
                 <div>
@@ -191,7 +191,7 @@ export default function UltraSidebar({ onCollapse }) {
                 exit={{ opacity: 0 }}
                 className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 cursor-pointer transition-colors"
               >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-orange-500" />
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-orange-500" />
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-white">Admin User</p>
                   <p className="text-xs text-gray-400">admin@chronos.com</p>
@@ -202,7 +202,7 @@ export default function UltraSidebar({ onCollapse }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="w-10 h-10 mx-auto rounded-full bg-gradient-to-br from-pink-500 to-orange-500"
+                className="w-10 h-10 mx-auto rounded-full bg-gradient-to-br from-cyan-500 to-orange-500"
               />
             )}
           </AnimatePresence>
@@ -246,7 +246,7 @@ function NavigationItem({ item, isCollapsed, isActive, isSubmenuOpen, onSubmenuT
             transition-all duration-200
             ${
               isActive
-                ? 'bg-gradient-to-r from-blue-500/20 to-purple-600/20 text-white'
+                ? 'bg-gradient-to-r from-blue-500/20 to-blue-600/20 text-white'
                 : 'text-gray-300 hover:bg-white/5 hover:text-white'
             }
           `}

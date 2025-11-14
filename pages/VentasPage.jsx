@@ -115,14 +115,14 @@ const AnimatedStatCard = ({ label, value, format, trend, color, icon: Icon, dela
   const colorClasses = {
     green: 'from-emerald-500/20 to-emerald-500/5 border-emerald-500/30',
     cyan: 'from-cyan-500/20 to-cyan-500/5 border-cyan-500/30',
-    purple: 'from-purple-500/20 to-purple-500/5 border-purple-500/30',
+    cyan: 'from-blue-500/20 to-blue-500/5 border-blue-500/30',
     orange: 'from-orange-500/20 to-orange-500/5 border-orange-500/30',
   };
 
   const iconColorClasses = {
     green: 'text-emerald-400',
     cyan: 'text-cyan-400',
-    purple: 'text-purple-400',
+    cyan: 'text-blue-400',
     orange: 'text-orange-400',
   };
 
@@ -195,8 +195,8 @@ const AnimatedStatCard = ({ label, value, format, trend, color, icon: Icon, dela
               ? 'rgba(16, 185, 129, 0.5)'
               : color === 'cyan'
                 ? 'rgba(6, 182, 212, 0.5)'
-                : color === 'purple'
-                  ? 'rgba(168, 85, 247, 0.5)'
+                : color === 'blue'
+                  ? 'rgba(59, 130, 246, 0.5)'
                   : 'rgba(249, 115, 22, 0.5)',
         }}
       />
@@ -296,7 +296,7 @@ const VentasPage = () => {
       sortable: true,
       render: (value) => (
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-sm font-bold">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-sm font-bold">
             {value?.charAt(0)}
           </div>
           <span className="text-white font-medium">{value}</span>
@@ -409,7 +409,7 @@ const VentasPage = () => {
             whileHover="hover"
             whileTap="tap"
             onClick={() => handleOpenModal()}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-xl text-white font-semibold shadow-lg shadow-cyan-500/50 hover:shadow-xl hover:shadow-cyan-500/70 transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl text-white font-semibold shadow-lg shadow-cyan-500/50 hover:shadow-xl hover:shadow-cyan-500/70 transition-all"
           >
             <Plus className="w-5 h-5" />
             Nueva Venta
@@ -451,7 +451,7 @@ const VentasPage = () => {
               value={stats?.promedioVenta || 0}
               format="currency"
               trend={-2.1}
-              color="purple"
+              color="blue"
               icon={TrendingUp}
               delay={2}
             />
@@ -730,7 +730,7 @@ const VentasPage = () => {
               type="submit"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+              className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg text-white font-semibold shadow-lg hover:shadow-xl transition-all"
             >
               {editingVenta ? 'Actualizar' : 'Crear Venta'}
             </motion.button>

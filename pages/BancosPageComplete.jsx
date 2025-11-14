@@ -89,7 +89,7 @@ const BANCOS = [
     id: 'azteca',
     nombre: 'Banco Azteca',
     icon: '🏛️',
-    color: 'from-purple-500 to-pink-500',
+    color: 'from-blue-500 to-cyan-500',
     moneda: 'MXN',
     tipo: 'manual',
     descripcion: 'Cuenta bancaria',
@@ -409,8 +409,8 @@ const BancosPageComplete = () => {
         title: 'Transferencias',
         value: totalTransferencias,
         icon: ArrowLeftRight,
-        color: 'text-purple-500',
-        bgColor: 'bg-purple-500/10',
+        color: 'text-blue-500',
+        bgColor: 'bg-blue-500/10',
         descripcion: 'Enviadas/Recibidas',
       },
     ],
@@ -593,7 +593,7 @@ const BancosPageComplete = () => {
         accessorKey: 'monto',
         header: 'Monto',
         cell: ({ row }) => (
-          <span className="font-bold text-purple-600">
+          <span className="font-bold text-blue-600">
             {formatCurrency(row.original.monto, bancoActual?.moneda)}
           </span>
         ),
@@ -769,7 +769,7 @@ const BancosPageComplete = () => {
           {/* Transferencia Form */}
           <div className="bg-white rounded-xl p-6 shadow-lg">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <ArrowLeftRight className="w-5 h-5 text-purple-500" />
+              <ArrowLeftRight className="w-5 h-5 text-blue-500" />
               Transferencia
             </h3>
             <form
@@ -802,7 +802,7 @@ const BancosPageComplete = () => {
               <button
                 type="submit"
                 disabled={creandoTransferencia}
-                className="w-full bg-purple-500 text-white py-2 rounded-lg hover:bg-purple-600 disabled:opacity-50"
+                className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
               >
                 {creandoTransferencia ? 'Procesando...' : 'Transferir'}
               </button>

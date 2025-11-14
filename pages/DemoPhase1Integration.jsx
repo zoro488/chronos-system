@@ -98,7 +98,7 @@ const DemoKPIs = () => {
           value={stats?.productosVendidos || 1420}
           format="number"
           trend={-2.1}
-          color="purple"
+          color="blue"
           icon={Package}
           size="sm"
         />
@@ -143,7 +143,7 @@ const DemoKPIs = () => {
           label="Ventas en Proceso"
           value={stats?.ventasPendientes || 23}
           format="number"
-          color="purple"
+          color="blue"
           icon={ShoppingCart}
           size="md"
           pulse
@@ -290,7 +290,7 @@ const DemoFormWithValidation = () => {
       <div className="flex gap-4">
         <button
           onClick={demoToasts}
-          className="px-6 py-3 bg-neon-purple/20 border border-neon-purple/50 text-neon-purple rounded-lg hover:bg-neon-purple/30 transition-all font-semibold"
+          className="px-6 py-3 bg-neon-blue/20 border border-neon-blue/50 text-neon-blue rounded-lg hover:bg-neon-blue/30 transition-all font-semibold"
         >
           Probar Toast Notifications
         </button>

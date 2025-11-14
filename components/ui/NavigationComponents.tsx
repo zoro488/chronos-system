@@ -103,13 +103,13 @@ export function Tabs({
     pills: {
       container: 'space-x-2',
       tab: 'rounded-full',
-      active: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/50',
+      active: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-500/50',
       inactive: 'text-gray-400 hover:text-white hover:bg-white/10',
     },
     underline: {
       container: 'border-b border-white/10 space-x-6',
       tab: 'pb-3',
-      active: 'text-white border-b-2 border-purple-500',
+      active: 'text-white border-b-2 border-blue-500',
       inactive: 'text-gray-400 hover:text-white',
     },
   };
@@ -151,7 +151,7 @@ export function Tabs({
             {variant === 'underline' && isActive && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-cyan-500"
               />
             )}
           </button>
@@ -258,7 +258,7 @@ export function Pagination({
             className={cn(
               'flex h-10 w-10 items-center justify-center rounded-lg border font-medium transition-all',
               page === currentPage
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 border-purple-500 text-white shadow-lg shadow-purple-500/50'
+                ? 'bg-gradient-to-r from-blue-500 to-cyan-500 border-blue-500 text-white shadow-lg shadow-blue-500/50'
                 : 'border-white/10 bg-white/5 text-gray-300 backdrop-blur-xl hover:bg-white/10'
             )}
           >
@@ -344,7 +344,7 @@ export function Stepper({
                     isCompleted &&
                       'bg-green-500 border-green-500 text-white',
                     isActive &&
-                      'bg-purple-500 border-purple-500 text-white shadow-lg shadow-purple-500/50',
+                      'bg-blue-500 border-blue-500 text-white shadow-lg shadow-blue-500/50',
                     !isActive &&
                       !isCompleted &&
                       'border-white/20 bg-white/5 text-gray-400',
@@ -419,7 +419,7 @@ export function Stepper({
                   isCompleted &&
                     'bg-green-500 border-green-500 text-white',
                   isActive &&
-                    'bg-purple-500 border-purple-500 text-white shadow-lg shadow-purple-500/50',
+                    'bg-blue-500 border-blue-500 text-white shadow-lg shadow-blue-500/50',
                   !isActive &&
                     !isCompleted &&
                     'border-white/20 bg-white/5 text-gray-400',

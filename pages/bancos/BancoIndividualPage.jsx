@@ -406,7 +406,7 @@ export default function BancoIndividualPage({ bancoId, bancoName, bancoIcon, ban
           value={mockData.capital}
           change={12.5}
           icon={Wallet}
-          color="from-purple-500 to-purple-600"
+          color="from-blue-500 to-blue-600"
         />
         <KPICard
           title="Total Ingresos"
@@ -514,7 +514,7 @@ export default function BancoIndividualPage({ bancoId, bancoName, bancoIcon, ban
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-all ${
                 activeTab === tab.id
-                  ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
+                  ? 'bg-gradient-to-r from-blue-500 to-blue-500 text-white shadow-lg'
                   : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
               }`}
             >
@@ -562,7 +562,7 @@ export default function BancoIndividualPage({ bancoId, bancoName, bancoIcon, ban
               actions={
                 <button
                   onClick={() => setShowTransferModal(true)}
-                  className="flex items-center gap-2 rounded-lg bg-purple-500 px-4 py-2 text-white hover:bg-purple-600"
+                  className="flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
                 >
                   <Repeat className="h-4 w-4" />
                   Nueva Transferencia

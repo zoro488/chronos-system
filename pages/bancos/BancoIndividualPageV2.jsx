@@ -84,7 +84,7 @@ function DataTable({ data, columns, title, onEdit, onDelete, onView, loading }) 
     return (
       <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-lg dark:border-gray-800 dark:bg-gray-900">
         <div className="flex items-center justify-center">
-          <Spinner size="large" color="purple" />
+          <Spinner size="large" color="blue" />
         </div>
       </div>
     )
@@ -252,7 +252,7 @@ export default function BancoIndividualPageV2({ bancoId, bancoName, bancoIcon, b
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
-          <Spinner size="xlarge" color="purple" />
+          <Spinner size="xlarge" color="blue" />
           <p className="mt-4 text-gray-500">Cargando datos de {bancoName}...</p>
         </div>
       </div>
@@ -261,7 +261,7 @@ export default function BancoIndividualPageV2({ bancoId, bancoName, bancoIcon, b
 
   // ==================== RENDER ====================
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 p-6">
       {/* ==================== HEADER ==================== */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

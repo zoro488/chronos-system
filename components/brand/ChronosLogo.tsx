@@ -67,14 +67,14 @@ export default function ChronosLogo({
     <div className={`flex items-center gap-3 ${className}`}>
       {/* Logo Icon */}
       <motion.div
-        className={`relative ${sizeClasses[size]} rounded-xl bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 p-0.5`}
+        className={`relative ${sizeClasses[size]} rounded-xl bg-gradient-to-br from-blue-500 via-cyan-500 to-blue-600 p-0.5`}
         variants={animated ? logoVariants : undefined}
         initial={animated ? 'initial' : undefined}
         animate={animated ? 'animate' : undefined}
         whileHover={animated ? 'hover' : undefined}
       >
         {/* Inner glow effect */}
-        <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-purple-400/50 to-pink-400/50 blur-xl" />
+        <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-400/50 to-cyan-400/50 blur-xl" />
 
         {/* Logo content */}
         <div className="relative flex h-full w-full items-center justify-center rounded-xl bg-slate-900">
@@ -148,7 +148,7 @@ export default function ChronosLogo({
           animate={animated ? { opacity: 1, x: 0 } : undefined}
           transition={animated ? { delay: 0.3, duration: 0.6 } : undefined}
         >
-          <h1 className={`font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent ${textSizeClasses[size]}`}>
+          <h1 className={`font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent ${textSizeClasses[size]}`}>
             CHRONOS
           </h1>
           {size === 'large' || size === 'xlarge' ? (
@@ -174,7 +174,7 @@ export function ChronosLogoIcon({ size = 'medium', animated = false, className =
 
 export function ChronosLogoMinimal({ className = '' }: { className?: string }) {
   return (
-    <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 ${className}`}>
+    <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 ${className}`}>
       <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
         <circle cx="12" cy="12" r="9" stroke="white" strokeWidth="2" />
         <line x1="12" y1="12" x2="12" y2="7" stroke="white" strokeWidth="2" strokeLinecap="round" />

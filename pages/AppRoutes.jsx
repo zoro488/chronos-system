@@ -168,7 +168,7 @@ export const AppRoutes = () => {
 // ============================================================================
 
 const LoginPlaceholder = () => (
-  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
+  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 via-blue-900 to-cyan-900">
     <div className="p-8 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20">
       <h1 className="text-3xl font-bold text-white mb-4">CHRONOS Login</h1>
       <p className="text-white/60">Authentication page (to be implemented)</p>
@@ -183,7 +183,7 @@ const NotFoundPage = () => (
       <p className="text-xl text-white/60 mb-8">Página no encontrada</p>
       <a
         href="/"
-        className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold hover:opacity-90 transition-opacity"
+        className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold hover:opacity-90 transition-opacity"
       >
         Volver al Dashboard
       </a>

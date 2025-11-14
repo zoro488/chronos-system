@@ -52,7 +52,7 @@ const ClientCard = ({ cliente, onEdit, onDelete }) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const tipoColors = {
-    mayorista: 'from-purple-500 to-pink-500',
+    mayorista: 'from-blue-500 to-cyan-500',
     minorista: 'from-cyan-500 to-blue-500',
     distribuidor: 'from-orange-500 to-red-500',
   };
@@ -296,7 +296,7 @@ const ClientesPage = () => {
           <div
             className={`w-10 h-10 rounded-full bg-gradient-to-br ${
               row.tipo === 'mayorista'
-                ? 'from-purple-500 to-pink-500'
+                ? 'from-blue-500 to-cyan-500'
                 : row.tipo === 'minorista'
                   ? 'from-cyan-500 to-blue-500'
                   : 'from-orange-500 to-red-500'
@@ -413,7 +413,7 @@ const ClientesPage = () => {
               label="Mayoristas"
               value={stats.mayoristas}
               format="number"
-              color="purple"
+              color="blue"
               icon={Building2}
               delay={2}
             />
@@ -471,7 +471,7 @@ const ClientesPage = () => {
                   className="flex items-center justify-between p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-sm font-bold">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-sm font-bold">
                       {cliente.nombre?.charAt(0)}
                     </div>
                     <div>
@@ -654,7 +654,7 @@ const ClientesPage = () => {
               type="submit"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg text-white font-semibold shadow-lg"
+              className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg text-white font-semibold shadow-lg"
             >
               {editingCliente ? 'Actualizar' : 'Crear Cliente'}
             </motion.button>
