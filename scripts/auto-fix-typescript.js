@@ -52,7 +52,12 @@ class TypeScriptAutoFix {
     content = content.replace(importRegex, (match) => {
       if (!match.includes('.ts') && !match.includes('.js') && !match.includes('.tsx')) {
         const extension = filePath.endsWith('.tsx') ? '.tsx' : '.ts';
-        return match.replace("'", `${extension}'`).replace('"', `${extension}"`);
+        // Insert extension before the closing quote
+        if (match.includes("'")) {
+          return match.replace(/';$/, `${extension}';`);
+        } else {
+          return match.replace(/";$/, `${extension}";`);
+        }
       }
       return match;
     });
