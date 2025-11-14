@@ -55,7 +55,7 @@ export const AI_PROMPTS = [
     prompt:
       'Proyecta las ventas del próximo mes basándote en el histórico de los últimos 6 meses, tendencias estacionales, y factores externos conocidos.',
     icon: '📈',
-    color: 'from-purple-500 to-pink-500',
+    color: 'from-blue-500 to-cyan-500',
   },
   {
     id: 'predecir-stock-agotado',
@@ -65,7 +65,7 @@ export const AI_PROMPTS = [
     prompt:
       'Identifica qué productos se agotarán en los próximos 7 días basándote en la velocidad de venta actual y stock disponible.',
     icon: '⚠️',
-    color: 'from-purple-500 to-pink-500',
+    color: 'from-blue-500 to-cyan-500',
   },
   {
     id: 'predecir-gastos',
@@ -75,7 +75,7 @@ export const AI_PROMPTS = [
     prompt:
       'Estima los gastos del próximo mes en cada categoría (nómina, renta, servicios, operativos) basándote en el histórico y gastos recurrentes.',
     icon: '💸',
-    color: 'from-purple-500 to-pink-500',
+    color: 'from-blue-500 to-cyan-500',
   },
 
   // ===== CATEGORÍA: OPTIMIZACIÓN (3 prompts) =====

@@ -153,7 +153,7 @@ export default function SplashScreen({
                 transition={{ duration: 0.3 }}
               >
                 {/* Gradient fill */}
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-cyan-500 to-purple-500" />
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-cyan-500 to-cyan-500" />
 
                 {/* Animated shine effect */}
                 <motion.div
@@ -169,7 +169,7 @@ export default function SplashScreen({
                 />
 
                 {/* Glow effect */}
-                <div className="absolute inset-0 blur-sm bg-gradient-to-r from-purple-500 via-cyan-500 to-purple-500" />
+                <div className="absolute inset-0 blur-sm bg-gradient-to-r from-blue-500 via-cyan-500 to-cyan-500" />
               </motion.div>
             </div>
 

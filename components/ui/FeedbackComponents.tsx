@@ -590,7 +590,7 @@ export function Badge({
 }: BadgeProps) {
   const variantClasses = {
     default: 'bg-white/10 text-gray-300',
-    primary: 'bg-blue-500/20 text-purple-300 border-blue-500/30',
+    primary: 'bg-blue-500/20 text-cyan-300 border-blue-500/30',
     success: 'bg-green-500/20 text-green-300 border-green-500/30',
     warning: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
     error: 'bg-red-500/20 text-red-300 border-red-500/30',
