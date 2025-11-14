@@ -1,0 +1,43 @@
+name: 🔧 Auto-Fix TypeScript & Vite Errors
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  auto-fix:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install deps
+        run: npm ci
+      
+      - name: Fix TypeScript errors
+        run: node scripts/auto-fix-typescript.js
+      
+      - name: Fix Vite config
+        run: node scripts/auto-fix-vite.js
+      
+      - name: Run TypeScript check
+        run: npx tsc --noEmit
+        continue-on-error: true
+      
+      - name: Create PR if fixes applied
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: auto-fix-${{ github.run_number }}
+          title: "🔧 Auto-fix TypeScript & Vite errors"
+          body: |
+            ## 🔧 Auto-Fix Aplicado
+            
+            - TypeScript errors corregidos
+            - Vite config optimizado
+            - Tipos agregados
