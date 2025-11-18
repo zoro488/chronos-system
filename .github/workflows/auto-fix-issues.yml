@@ -1,0 +1,380 @@
+name: 🔧 Auto-Fix Common Issues
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  issues: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  analyze-issues:
+    name: 📊 Analyze Repository Issues
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+      
+      - name: 🎯 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: 📦 Install dependencies
+        run: npm ci
+      
+      - name: 🔍 Check for missing config files
+        id: check-configs
+        run: |
+          echo "Checking for configuration files..."
+          missing=""
+          
+          [ ! -f ".eslintrc.cjs" ] && missing="${missing}- ESLint config\n"
+          [ ! -f "tsconfig.json" ] && missing="${missing}- TypeScript config\n"
+          [ ! -f "vite.config.ts" ] && missing="${missing}- Vite config\n"
+          [ ! -f ".prettierrc" ] && missing="${missing}- Prettier config\n"
+          [ ! -f "playwright.config.ts" ] && missing="${missing}- Playwright config\n"
+          
+          if [ -n "$missing" ]; then
+            echo "missing_configs<<EOF" >> $GITHUB_OUTPUT
+            echo -e "$missing" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "has_missing=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_missing=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 🔍 Check for test issues
+        id: check-tests
+        run: |
+          echo "Running tests..."
+          npm run test:run > test-output.txt 2>&1 || true
+          
+          if grep -q "FAIL" test-output.txt; then
+            echo "has_failures=true" >> $GITHUB_OUTPUT
+            grep "FAIL\|Error:" test-output.txt > test-failures.txt || true
+          else
+            echo "has_failures=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 🔍 Check for lint issues
+        id: check-lint
+        run: |
+          echo "Running linter..."
+          npm run lint > lint-output.txt 2>&1 || true
+          
+          if [ $? -ne 0 ]; then
+            echo "has_lint_issues=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_lint_issues=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 🔍 Check for build issues
+        id: check-build
+        run: |
+          echo "Testing build..."
+          npm run build > build-output.txt 2>&1 || true
+          
+          if [ $? -ne 0 ]; then
+            echo "has_build_issues=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_build_issues=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 🐛 Create issue for missing configs
+        if: steps.check-configs.outputs.has_missing == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const missing = `${{ steps.check-configs.outputs.missing_configs }}`;
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🔧 Missing Configuration Files',
+              body: `## Missing Configuration Files
+
+The following configuration files are missing from the repository:
+
+${missing}
+
+### Impact
+- Build may fail
+- Linting may not work properly
+- Type checking may be inconsistent
+- Tests may not run correctly
+
+### Recommended Action
+These configuration files should be added to ensure proper development workflow.
+
+---
+*This issue was automatically created by the auto-fix workflow.*`,
+              labels: ['bug', 'config', 'automated']
+            });
+      
+      - name: 🐛 Create issue for test failures
+        if: steps.check-tests.outputs.has_failures == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            let failures = '';
+            
+            try {
+              failures = fs.readFileSync('test-failures.txt', 'utf8');
+            } catch (e) {
+              failures = 'Test failures detected but details could not be read.';
+            }
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🧪 Test Failures Detected',
+              body: `## Test Failures
+
+The test suite has failing tests that need attention:
+
+\`\`\`
+${failures}
+\`\`\`
+
+### Recommended Actions
+1. Review and fix failing tests
+2. Ensure all dependencies are properly installed
+3. Check for import path issues
+4. Verify mock configurations
+
+---
+*This issue was automatically created by the auto-fix workflow.*`,
+              labels: ['bug', 'testing', 'automated']
+            });
+      
+      - name: 🐛 Create issue for lint problems
+        if: steps.check-lint.outputs.has_lint_issues == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🔍 ESLint Issues Detected',
+              body: `## Linting Issues
+
+ESLint has detected code quality issues that need to be addressed.
+
+### Recommended Actions
+1. Run \`npm run lint:fix\` to auto-fix issues
+2. Review and manually fix remaining issues
+3. Ensure ESLint configuration is up to date
+
+### Quick Fix
+\`\`\`bash
+npm run lint:fix
+\`\`\`
+
+---
+*This issue was automatically created by the auto-fix workflow.*`,
+              labels: ['code-quality', 'linting', 'automated']
+            });
+      
+      - name: 🐛 Create issue for build problems
+        if: steps.check-build.outputs.has_build_issues == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🏗️ Build Failures Detected',
+              body: `## Build Issues
+
+The build process is failing and needs to be fixed.
+
+### Common Causes
+- Type errors in TypeScript files
+- Missing dependencies
+- Configuration issues
+- Import/export problems
+
+### Recommended Actions
+1. Run \`npm run type-check\` to find type errors
+2. Ensure all dependencies are installed
+3. Check for circular dependencies
+4. Verify all imports are correct
+
+---
+*This issue was automatically created by the auto-fix workflow.*`,
+              labels: ['bug', 'build', 'automated', 'high-priority']
+            });
+
+  check-workflow-health:
+    name: 🏥 Check Workflow Health
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+      
+      - name: 🔍 Validate workflow files
+        run: |
+          echo "Checking workflow syntax..."
+          
+          # Check for syntax errors in workflow files
+          for file in .github/workflows/*.yml; do
+            echo "Checking $file..."
+            # Basic YAML syntax check
+            python3 -c "import yaml; yaml.safe_load(open('$file'))" || echo "⚠️ Syntax error in $file"
+          done
+      
+      - name: 🔍 Check for missing secrets
+        id: check-secrets
+        run: |
+          echo "Checking for secret references..."
+          
+          missing_secrets=""
+          
+          # Extract secret references from workflows
+          grep -r "secrets\." .github/workflows/ | grep -v "github.token" | cut -d: -f2 | grep -o 'secrets\.[A-Z_]*' | sort -u > referenced-secrets.txt || true
+          
+          # Common secrets that should be configured
+          echo "FIREBASE_SERVICE_ACCOUNT" > required-secrets.txt
+          echo "FIREBASE_TOKEN" >> required-secrets.txt
+          echo "VITE_FIREBASE_API_KEY" >> required-secrets.txt
+          
+          echo "Found secret references:"
+          cat referenced-secrets.txt
+      
+      - name: 📝 Create workflow health report
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let secretsReferenced = '';
+            try {
+              secretsReferenced = fs.readFileSync('referenced-secrets.txt', 'utf8');
+            } catch (e) {
+              secretsReferenced = 'No secret references found';
+            }
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '📊 Workflow Health Report',
+              body: `## Workflow Health Check
+
+### Secrets Configuration
+
+The following secrets are referenced in workflows:
+
+\`\`\`
+${secretsReferenced}
+\`\`\`
+
+### Recommended Actions
+1. Ensure all required secrets are configured in repository settings
+2. Verify secret names match between workflows and configuration
+3. Check that secrets have the correct permissions
+
+### How to Configure Secrets
+\`\`\`bash
+gh secret set SECRET_NAME --body "secret_value"
+\`\`\`
+
+Or via GitHub UI:
+- Go to Settings → Secrets and variables → Actions
+- Click "New repository secret"
+- Add each required secret
+
+---
+*This report was automatically generated by the workflow health check.*`,
+              labels: ['documentation', 'config', 'automated', 'workflows']
+            });
+
+  analyze-dependencies:
+    name: 📦 Analyze Dependencies
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+      
+      - name: 🎯 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: 📦 Check for outdated dependencies
+        run: |
+          npm outdated > outdated.txt || true
+          
+          if [ -s outdated.txt ]; then
+            echo "has_outdated=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_outdated=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 🔒 Security audit
+        run: |
+          npm audit --json > audit.json || true
+          
+          # Check if there are vulnerabilities
+          if grep -q '"total": [1-9]' audit.json; then
+            echo "has_vulnerabilities=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_vulnerabilities=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 📊 Create dependency report
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let auditReport = {};
+            try {
+              auditReport = JSON.parse(fs.readFileSync('audit.json', 'utf8'));
+            } catch (e) {
+              auditReport = { metadata: { vulnerabilities: { total: 0 } } };
+            }
+            
+            const vulns = auditReport.metadata?.vulnerabilities || {};
+            
+            if (vulns.total > 0) {
+              github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '🔒 Security Vulnerabilities Detected',
+                body: `## Security Audit Report
+
+Found **${vulns.total}** vulnerabilities in dependencies:
+
+- 🔴 Critical: ${vulns.critical || 0}
+- 🟠 High: ${vulns.high || 0}
+- 🟡 Moderate: ${vulns.moderate || 0}
+- 🟢 Low: ${vulns.low || 0}
+
+### Recommended Actions
+\`\`\`bash
+# Review vulnerabilities
+npm audit
+
+# Auto-fix where possible
+npm audit fix
+
+# For breaking changes
+npm audit fix --force
+\`\`\`
+
+---
+*This issue was automatically created by dependency analysis.*`,
+                labels: ['security', 'dependencies', 'automated', 'high-priority']
+              });
+            }

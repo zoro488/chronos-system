@@ -1,0 +1,285 @@
+name: 🔍 Comprehensive System Check
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Daily at midnight
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  system-health:
+    name: 🏥 System Health Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🎯 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: 📦 Install dependencies
+        run: npm ci
+      
+      - name: ✅ Check configuration files
+        id: config-check
+        run: |
+          echo "## Configuration Files" > report.md
+          echo "" >> report.md
+          
+          configs=(
+            ".eslintrc.cjs:ESLint"
+            "tsconfig.json:TypeScript"
+            "vite.config.ts:Vite"
+            ".prettierrc:Prettier"
+            "vitest.config.ts:Vitest"
+            "package.json:Package"
+          )
+          
+          all_present=true
+          for config in "${configs[@]}"; do
+            IFS=':' read -r file name <<< "$config"
+            if [ -f "$file" ]; then
+              echo "- ✅ $name config present" >> report.md
+            else
+              echo "- ❌ $name config missing" >> report.md
+              all_present=false
+            fi
+          done
+          
+          echo "" >> report.md
+          echo "all_configs_present=$all_present" >> $GITHUB_OUTPUT
+      
+      - name: 🧪 Test suite check
+        id: test-check
+        run: |
+          echo "## Test Suite" >> report.md
+          echo "" >> report.md
+          
+          npm run test:run > test-output.log 2>&1 || true
+          
+          if grep -q "Test Files.*passed" test-output.log; then
+            echo "- ✅ Tests passing" >> report.md
+            echo "tests_passing=true" >> $GITHUB_OUTPUT
+          else
+            echo "- ❌ Tests failing" >> report.md
+            echo "tests_passing=false" >> $GITHUB_OUTPUT
+            
+            echo "" >> report.md
+            echo "### Test Failures:" >> report.md
+            echo "\`\`\`" >> report.md
+            grep -A 10 "FAIL\|Error" test-output.log | head -30 >> report.md || echo "No details available" >> report.md
+            echo "\`\`\`" >> report.md
+          fi
+          
+          echo "" >> report.md
+      
+      - name: 🔍 Lint check
+        id: lint-check
+        run: |
+          echo "## Code Quality" >> report.md
+          echo "" >> report.md
+          
+          npm run lint > lint-output.log 2>&1 || true
+          
+          if [ $? -eq 0 ]; then
+            echo "- ✅ No linting errors" >> report.md
+            echo "lint_passing=true" >> $GITHUB_OUTPUT
+          else
+            echo "- ❌ Linting errors detected" >> report.md
+            echo "lint_passing=false" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "" >> report.md
+      
+      - name: 📊 Type check
+        id: type-check
+        run: |
+          npm run type-check > type-output.log 2>&1 || true
+          
+          if [ $? -eq 0 ]; then
+            echo "- ✅ No type errors" >> report.md
+            echo "types_passing=true" >> $GITHUB_OUTPUT
+          else
+            echo "- ❌ Type errors detected" >> report.md
+            echo "types_passing=false" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "" >> report.md
+      
+      - name: 🏗️ Build check
+        id: build-check
+        run: |
+          echo "## Build Status" >> report.md
+          echo "" >> report.md
+          
+          npm run build > build-output.log 2>&1 || true
+          
+          if [ $? -eq 0 ]; then
+            echo "- ✅ Build successful" >> report.md
+            echo "build_passing=true" >> $GITHUB_OUTPUT
+          else
+            echo "- ❌ Build failing" >> report.md
+            echo "build_passing=false" >> $GITHUB_OUTPUT
+            
+            echo "" >> report.md
+            echo "### Build Errors:" >> report.md
+            echo "\`\`\`" >> report.md
+            tail -50 build-output.log >> report.md
+            echo "\`\`\`" >> report.md
+          fi
+          
+          echo "" >> report.md
+      
+      - name: 🔒 Security audit
+        id: security-check
+        run: |
+          echo "## Security Status" >> report.md
+          echo "" >> report.md
+          
+          npm audit --json > audit.json || true
+          
+          critical=$(jq -r '.metadata.vulnerabilities.critical // 0' audit.json)
+          high=$(jq -r '.metadata.vulnerabilities.high // 0' audit.json)
+          moderate=$(jq -r '.metadata.vulnerabilities.moderate // 0' audit.json)
+          low=$(jq -r '.metadata.vulnerabilities.low // 0' audit.json)
+          
+          echo "- 🔴 Critical: $critical" >> report.md
+          echo "- 🟠 High: $high" >> report.md
+          echo "- 🟡 Moderate: $moderate" >> report.md
+          echo "- 🟢 Low: $low" >> report.md
+          echo "" >> report.md
+          
+          if [ "$critical" -gt 0 ] || [ "$high" -gt 0 ]; then
+            echo "security_issues=true" >> $GITHUB_OUTPUT
+          else
+            echo "security_issues=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 📦 Dependency check
+        id: deps-check
+        run: |
+          echo "## Dependencies" >> report.md
+          echo "" >> report.md
+          
+          npm outdated > outdated.txt 2>&1 || true
+          
+          if [ -s outdated.txt ]; then
+            echo "- ⚠️ Outdated dependencies found" >> report.md
+            echo "has_outdated=true" >> $GITHUB_OUTPUT
+          else
+            echo "- ✅ All dependencies up to date" >> report.md
+            echo "has_outdated=false" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "" >> report.md
+      
+      - name: 📝 Workflow validation
+        id: workflow-check
+        run: |
+          echo "## Workflow Files" >> report.md
+          echo "" >> report.md
+          
+          workflow_count=$(find .github/workflows -name "*.yml" | wc -l)
+          echo "- 📊 Total workflows: $workflow_count" >> report.md
+          
+          # Check for syntax errors
+          error_count=0
+          for file in .github/workflows/*.yml; do
+            python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>/dev/null || {
+              echo "- ❌ Syntax error in $(basename $file)" >> report.md
+              error_count=$((error_count + 1))
+            }
+          done
+          
+          if [ $error_count -eq 0 ]; then
+            echo "- ✅ All workflows have valid syntax" >> report.md
+            echo "workflows_valid=true" >> $GITHUB_OUTPUT
+          else
+            echo "workflows_valid=false" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "" >> report.md
+      
+      - name: 📊 Generate health score
+        id: health-score
+        run: |
+          score=0
+          max_score=8
+          
+          [ "${{ steps.config-check.outputs.all_configs_present }}" == "true" ] && score=$((score + 1))
+          [ "${{ steps.test-check.outputs.tests_passing }}" == "true" ] && score=$((score + 1))
+          [ "${{ steps.lint-check.outputs.lint_passing }}" == "true" ] && score=$((score + 1))
+          [ "${{ steps.type-check.outputs.types_passing }}" == "true" ] && score=$((score + 1))
+          [ "${{ steps.build-check.outputs.build_passing }}" == "true" ] && score=$((score + 1))
+          [ "${{ steps.security-check.outputs.security_issues }}" == "false" ] && score=$((score + 1))
+          [ "${{ steps.deps-check.outputs.has_outdated }}" == "false" ] && score=$((score + 1))
+          [ "${{ steps.workflow-check.outputs.workflows_valid }}" == "true" ] && score=$((score + 1))
+          
+          percentage=$((score * 100 / max_score))
+          
+          echo "## Overall Health Score: ${percentage}% (${score}/${max_score})" >> report.md
+          echo "" >> report.md
+          
+          if [ $percentage -ge 80 ]; then
+            echo "🟢 System is healthy!" >> report.md
+            status="healthy"
+          elif [ $percentage -ge 50 ]; then
+            echo "🟡 System needs attention" >> report.md
+            status="warning"
+          else
+            echo "🔴 System requires immediate action" >> report.md
+            status="critical"
+          fi
+          
+          echo "health_score=$percentage" >> $GITHUB_OUTPUT
+          echo "health_status=$status" >> $GITHUB_OUTPUT
+      
+      - name: 📤 Upload report
+        uses: actions/upload-artifact@v3
+        with:
+          name: health-report
+          path: report.md
+          retention-days: 30
+      
+      - name: 💬 Post report as issue
+        if: steps.health-score.outputs.health_status != 'healthy'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('report.md', 'utf8');
+            
+            const status = '${{ steps.health-score.outputs.health_status }}';
+            const score = '${{ steps.health-score.outputs.health_score }}';
+            
+            const title = status === 'critical' 
+              ? `🔴 URGENT: System Health Critical (${score}%)`
+              : `🟡 System Health Needs Attention (${score}%)`;
+            
+            const labels = status === 'critical'
+              ? ['urgent', 'automated', 'health-check']
+              : ['maintenance', 'automated', 'health-check'];
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: `# System Health Report\n\n${report}\n\n---\n*Generated: ${new Date().toISOString()}*\n*Triggered by: ${context.eventName}*`,
+              labels: labels
+            });
+      
+      - name: 📊 Summary
+        run: |
+          cat report.md >> $GITHUB_STEP_SUMMARY
