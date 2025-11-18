@@ -24,11 +24,66 @@ import {
   Minimize2,
   Send,
   Sparkles,
+  VolumeX,
   X,
 } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 import { MegaAIAgent } from '../../services/MegaAIAgent';
+
+// Simple VoiceService placeholder - should be implemented properly
+class VoiceService {
+  constructor() {
+    this.recognition = null;
+    this.synthesis = window.speechSynthesis;
+  }
+
+  isAvailable() {
+    return 'speechSynthesis' in window && 'webkitSpeechRecognition' in window;
+  }
+
+  startListening(onResult, onEnd) {
+    if (!this.isAvailable()) return;
+    
+    // eslint-disable-next-line no-undef
+    this.recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    this.recognition.continuous = true;
+    this.recognition.interimResults = true;
+    
+    this.recognition.onresult = (event) => {
+      const last = event.results.length - 1;
+      const transcript = event.results[last][0].transcript;
+      if (onResult) onResult(transcript, event.results[last].isFinal);
+    };
+    
+    this.recognition.onend = () => {
+      if (onEnd) onEnd();
+    };
+    
+    this.recognition.start();
+  }
+
+  stopListening() {
+    if (this.recognition) {
+      this.recognition.stop();
+      this.recognition = null;
+    }
+  }
+
+  speak(text) {
+    if (!this.synthesis) return;
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'es-ES';
+    this.synthesis.speak(utterance);
+  }
+
+  stopSpeaking() {
+    if (this.synthesis) {
+      this.synthesis.cancel();
+    }
+  }
+}
 
 /**
  * Widget Principal del Asistente IA

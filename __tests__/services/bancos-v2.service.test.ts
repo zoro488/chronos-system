@@ -12,7 +12,7 @@ import {
   updateDoc
 } from 'firebase/firestore';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import * as BancosService from '../../../services/bancos-v2.service';
+import * as BancosService from '../../services/bancos-v2.service';
 
 // Mock Firebase functions
 vi.mock('firebase/firestore');

@@ -1,0 +1,103 @@
+name: 🔧 System Problem
+description: Report a system-level issue (build, tests, workflows, etc.)
+title: "[SYSTEM] "
+labels: ["system", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a system-level issue. This template helps track infrastructure, build, test, or workflow problems.
+
+  - type: dropdown
+    id: problem-area
+    attributes:
+      label: Problem Area
+      description: What area of the system is affected?
+      options:
+        - Build Process
+        - Test Infrastructure
+        - CI/CD Workflows
+        - Configuration Files
+        - Dependencies
+        - Development Environment
+        - Deployment
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Problem Description
+      description: Describe the system problem in detail
+      placeholder: |
+        e.g., "The CI workflow fails during the build step with TypeScript compilation errors"
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-logs
+    attributes:
+      label: Error Logs or Output
+      description: Paste any relevant error messages or logs
+      placeholder: |
+        Paste error logs here...
+      render: shell
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this problem?
+      placeholder: |
+        1. Run `npm run build`
+        2. Observe the error...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact Level
+      description: How severely does this affect development?
+      options:
+        - Critical - Blocks all development
+        - High - Blocks major workflows
+        - Medium - Impacts some workflows
+        - Low - Minor inconvenience
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Provide relevant environment details
+      placeholder: |
+        - OS: Ubuntu 22.04
+        - Node version: 18.x
+        - npm version: 9.x
+        - Browser (if applicable): Chrome 120
+
+  - type: textarea
+    id: attempted-solutions
+    attributes:
+      label: Attempted Solutions
+      description: What have you tried to fix this?
+      placeholder: |
+        - Tried clearing node_modules and reinstalling
+        - Checked configuration files
+        - etc.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched for similar issues
+          required: true
+        - label: I have provided all relevant error logs
+          required: true
+        - label: I have described the impact clearly
+          required: true

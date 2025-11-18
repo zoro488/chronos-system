@@ -1,0 +1,96 @@
+name: 🤖 Automation Request
+description: Request new automation, workflow, or CI/CD improvement
+title: "[AUTOMATION] "
+labels: ["automation", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Request new automation features or improvements to existing workflows.
+
+  - type: dropdown
+    id: automation-type
+    attributes:
+      label: Type of Automation
+      description: What kind of automation are you requesting?
+      options:
+        - GitHub Actions Workflow
+        - Issue/PR Automation
+        - Code Quality Check
+        - Security Scan
+        - Deployment Automation
+        - Notification/Alert
+        - Scheduled Task
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Automation Description
+      description: Describe what you want to automate
+      placeholder: |
+        e.g., "Automatically label PRs based on changed files"
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case / Problem to Solve
+      description: Why is this automation needed?
+      placeholder: |
+        Currently we manually label PRs, which is time-consuming...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: How would you implement this automation?
+      placeholder: |
+        Use GitHub Actions with tj-actions/changed-files to detect...
+
+  - type: textarea
+    id: triggers
+    attributes:
+      label: Trigger Conditions
+      description: When should this automation run?
+      placeholder: |
+        - On pull request opened/updated
+        - On schedule (daily)
+        - Manual trigger
+        - etc.
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this automation?
+      options:
+        - High - Would significantly improve workflow
+        - Medium - Would be helpful
+        - Low - Nice to have
+    validations:
+      required: true
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples or References
+      description: Link to similar implementations or examples
+      placeholder: |
+        - https://github.com/example/repo/blob/main/.github/workflows/example.yml
+        - Similar implementation in XYZ project
+
+  - type: checkboxes
+    id: considerations
+    attributes:
+      label: Considerations
+      options:
+        - label: This automation requires secrets/tokens
+        - label: This automation needs approval for security
+        - label: This automation may have cost implications
+        - label: This is compatible with existing workflows

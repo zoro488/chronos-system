@@ -1,0 +1,271 @@
+name: 📊 Workflow Failure Tracker
+
+on:
+  workflow_run:
+    workflows: ["*"]
+    types: [completed]
+  schedule:
+    - cron: '0 */12 * * *'  # Every 12 hours
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+
+jobs:
+  track-failures:
+    name: 🔍 Track Workflow Failures
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'failure' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+      
+      - name: 🔍 Analyze workflow failure
+        if: github.event_name == 'workflow_run'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const workflowRun = context.payload.workflow_run;
+            
+            // Get workflow jobs
+            const jobs = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: workflowRun.id
+            });
+            
+            // Find failed jobs
+            const failedJobs = jobs.data.jobs.filter(job => job.conclusion === 'failure');
+            
+            if (failedJobs.length > 0) {
+              let failureDetails = '';
+              
+              for (const job of failedJobs) {
+                failureDetails += `### Job: ${job.name}\n\n`;
+                failureDetails += `- **Status**: ${job.conclusion}\n`;
+                failureDetails += `- **Started**: ${job.started_at}\n`;
+                failureDetails += `- **Duration**: ${Math.round((new Date(job.completed_at) - new Date(job.started_at)) / 1000)}s\n\n`;
+                
+                // Get failed steps
+                const failedSteps = job.steps.filter(step => step.conclusion === 'failure');
+                if (failedSteps.length > 0) {
+                  failureDetails += `**Failed Steps:**\n`;
+                  for (const step of failedSteps) {
+                    failureDetails += `- ${step.name}\n`;
+                  }
+                  failureDetails += '\n';
+                }
+              }
+              
+              // Create or update issue
+              const issues = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: 'workflow-failure',
+                per_page: 100
+              });
+              
+              const existingIssue = issues.data.find(
+                issue => issue.title.includes(workflowRun.name)
+              );
+              
+              const issueBody = `## Workflow Failure Report
+
+**Workflow**: ${workflowRun.name}
+**Run ID**: [#${workflowRun.run_number}](${workflowRun.html_url})
+**Branch**: ${workflowRun.head_branch}
+**Commit**: ${workflowRun.head_sha.substring(0, 7)}
+**Triggered by**: ${workflowRun.actor.login}
+**Event**: ${workflowRun.event}
+
+${failureDetails}
+
+### Quick Actions
+
+1. **View logs**: ${workflowRun.html_url}
+2. **Re-run workflow**: \`gh run rerun ${workflowRun.id}\`
+3. **View commit**: ${workflowRun.repository.html_url}/commit/${workflowRun.head_sha}
+
+---
+*Last updated: ${new Date().toISOString()}*
+*Auto-tracked by workflow failure tracker*`;
+              
+              if (existingIssue) {
+                // Update existing issue
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: existingIssue.number,
+                  body: `## New Failure Detected\n\n${issueBody}`
+                });
+              } else {
+                // Create new issue
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: `🔴 Workflow Failure: ${workflowRun.name}`,
+                  body: issueBody,
+                  labels: ['workflow-failure', 'automated', 'bug']
+                });
+              }
+            }
+      
+      - name: 📊 Generate failure report
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            // Get recent workflow runs
+            const runs = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+              status: 'completed'
+            });
+            
+            // Analyze failures
+            const failures = runs.data.workflow_runs.filter(run => run.conclusion === 'failure');
+            const last24h = failures.filter(run => {
+              const runDate = new Date(run.created_at);
+              const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+              return runDate > yesterday;
+            });
+            
+            if (last24h.length > 0) {
+              // Group by workflow
+              const failuresByWorkflow = {};
+              for (const run of last24h) {
+                const name = run.name;
+                if (!failuresByWorkflow[name]) {
+                  failuresByWorkflow[name] = [];
+                }
+                failuresByWorkflow[name].push(run);
+              }
+              
+              // Generate report
+              let report = `## Workflow Failures (Last 24 Hours)\n\n`;
+              report += `**Total Failures**: ${last24h.length}\n\n`;
+              
+              for (const [workflow, runs] of Object.entries(failuresByWorkflow)) {
+                report += `### ${workflow}\n`;
+                report += `- Failures: ${runs.length}\n`;
+                report += `- Latest: [Run #${runs[0].run_number}](${runs[0].html_url})\n\n`;
+              }
+              
+              report += `### Recommendations\n\n`;
+              report += `1. Review failed workflows and identify patterns\n`;
+              report += `2. Check for infrastructure issues\n`;
+              report += `3. Verify dependencies and configurations\n`;
+              report += `4. Consider adding retry logic for flaky tests\n\n`;
+              
+              // Create summary issue
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `📊 Workflow Failure Summary - ${new Date().toISOString().split('T')[0]}`,
+                body: report + `\n---\n*Auto-generated daily report*`,
+                labels: ['workflow-failure', 'report', 'automated']
+              });
+            }
+
+  analyze-patterns:
+    name: 🔍 Analyze Failure Patterns
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: 📊 Analyze common failure patterns
+        uses: actions/github-script@v6
+        with:
+          script: |
+            // Get all open workflow failure issues
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'workflow-failure',
+              per_page: 100
+            });
+            
+            if (issues.data.length === 0) {
+              console.log('✅ No open workflow failure issues');
+              return;
+            }
+            
+            // Analyze patterns
+            const patterns = {
+              testFailures: 0,
+              buildFailures: 0,
+              lintFailures: 0,
+              deploymentFailures: 0,
+              securityFailures: 0,
+              other: 0
+            };
+            
+            for (const issue of issues.data) {
+              const body = issue.body.toLowerCase();
+              
+              if (body.includes('test') || body.includes('vitest') || body.includes('playwright')) {
+                patterns.testFailures++;
+              } else if (body.includes('build') || body.includes('compile')) {
+                patterns.buildFailures++;
+              } else if (body.includes('lint') || body.includes('eslint')) {
+                patterns.lintFailures++;
+              } else if (body.includes('deploy') || body.includes('firebase')) {
+                patterns.deploymentFailures++;
+              } else if (body.includes('security') || body.includes('audit') || body.includes('snyk')) {
+                patterns.securityFailures++;
+              } else {
+                patterns.other++;
+              }
+            }
+            
+            // Generate pattern report
+            let report = `## Workflow Failure Pattern Analysis\n\n`;
+            report += `**Total Open Issues**: ${issues.data.length}\n\n`;
+            report += `### Failure Categories\n\n`;
+            report += `- 🧪 Test Failures: ${patterns.testFailures}\n`;
+            report += `- 🏗️ Build Failures: ${patterns.buildFailures}\n`;
+            report += `- 🔍 Lint Failures: ${patterns.lintFailures}\n`;
+            report += `- 🚀 Deployment Failures: ${patterns.deploymentFailures}\n`;
+            report += `- 🔒 Security Failures: ${patterns.securityFailures}\n`;
+            report += `- ❓ Other: ${patterns.other}\n\n`;
+            
+            // Recommendations based on patterns
+            report += `### Priority Actions\n\n`;
+            
+            if (patterns.testFailures > 2) {
+              report += `🔴 **HIGH**: Multiple test failures detected. Consider:\n`;
+              report += `- Review test infrastructure\n`;
+              report += `- Check for flaky tests\n`;
+              report += `- Update test dependencies\n\n`;
+            }
+            
+            if (patterns.buildFailures > 2) {
+              report += `🔴 **HIGH**: Multiple build failures. Consider:\n`;
+              report += `- Review TypeScript configuration\n`;
+              report += `- Check for dependency conflicts\n`;
+              report += `- Verify build scripts\n\n`;
+            }
+            
+            if (patterns.securityFailures > 0) {
+              report += `🔴 **CRITICAL**: Security failures detected. Immediate action required!\n\n`;
+            }
+            
+            // Post summary
+            core.summary
+              .addHeading('Workflow Failure Pattern Analysis')
+              .addTable([
+                [{data: 'Category', header: true}, {data: 'Count', header: true}],
+                ['🧪 Test Failures', patterns.testFailures.toString()],
+                ['🏗️ Build Failures', patterns.buildFailures.toString()],
+                ['🔍 Lint Failures', patterns.lintFailures.toString()],
+                ['🚀 Deployment Failures', patterns.deploymentFailures.toString()],
+                ['🔒 Security Failures', patterns.securityFailures.toString()],
+                ['❓ Other', patterns.other.toString()]
+              ])
+              .write();
