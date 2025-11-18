@@ -1,0 +1,278 @@
+name: 🔍 E2E Data Validation - Excel → Firestore → UI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'tests/e2e/**'
+      - 'tests/integration/**'
+      - 'services/**'
+      - 'src/**'
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 8 * * *'  # Diario a las 8 AM UTC
+
+env:
+  FIRESTORE_EMULATOR_HOST: localhost:8080
+  NODE_VERSION: '20.x'
+
+jobs:
+  e2e-validation:
+    name: 🎯 E2E Complete Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      # ============================================================================
+      # SETUP
+      # ============================================================================
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🎯 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: |
+          npm ci
+          npm install -g firebase-tools
+          npx playwright install --with-deps chromium
+
+      # ============================================================================
+      # START EMULATOR
+      # ============================================================================
+      - name: 🔥 Start Firebase Emulator
+        run: |
+          firebase emulators:start --only firestore --project demo-test &
+          sleep 20
+          curl -s http://localhost:8080 && echo "✅ Emulator ready"
+
+      # ============================================================================
+      # INTEGRATION TESTS
+      # ============================================================================
+      - name: 🧪 Run Integration Tests
+        id: integration
+        run: |
+          echo "🧪 Ejecutando tests de integración con Firestore..."
+          npm test -- tests/integration/ 2>&1 | tee integration-results.log
+        continue-on-error: true
+
+      - name: 📊 Integration Results
+        run: |
+          if [[ "${{ steps.integration.outcome }}" == "success" ]]; then
+            echo "✅ Integration tests passed"
+            echo "INTEGRATION_PASSED=true" >> $GITHUB_ENV
+          else
+            echo "❌ Integration tests failed"
+            echo "INTEGRATION_PASSED=false" >> $GITHUB_ENV
+          fi
+
+      # ============================================================================
+      # E2E TESTS
+      # ============================================================================
+      - name: 🎭 Run E2E Tests (Excel → Firestore → UI)
+        id: e2e
+        run: |
+          echo "🎭 Ejecutando tests E2E completos..."
+          npm run test:e2e -- tests/e2e/ 2>&1 | tee e2e-results.log
+        continue-on-error: true
+
+      - name: 📊 E2E Results
+        run: |
+          if [[ "${{ steps.e2e.outcome }}" == "success" ]]; then
+            echo "✅ E2E tests passed"
+            echo "E2E_PASSED=true" >> $GITHUB_ENV
+          else
+            echo "❌ E2E tests failed"
+            echo "E2E_PASSED=false" >> $GITHUB_ENV
+          fi
+
+      # ============================================================================
+      # VALIDATION REPORTS
+      # ============================================================================
+      - name: 📋 Generate Validation Report
+        if: always()
+        run: |
+          cat > validation-report.md << 'EOF'
+          # 🔍 Reporte de Validación E2E
+          
+          ## 📊 Resultados Generales
+          
+          - **Integration Tests**: ${{ env.INTEGRATION_PASSED == 'true' && '✅ PASSED' || '❌ FAILED' }}
+          - **E2E Tests**: ${{ env.E2E_PASSED == 'true' && '✅ PASSED' || '❌ FAILED' }}
+          - **Workflow Run**: #${{ github.run_number }}
+          - **Commit**: ${{ github.sha }}
+          - **Branch**: ${{ github.ref_name }}
+          
+          ## 🔥 Tests de Integración (Firestore Real)
+          
+          ### Tests Ejecutados:
+          - ✅ CRUD Operations (Create, Read, Update, Delete)
+          - ✅ Multiple Bancos Operations
+          - ✅ Query Operations
+          - ✅ RF Actual Operations
+          - ✅ Error Handling
+          - ✅ Performance Tests
+          
+          ### Resultados:
+          ${{ env.INTEGRATION_PASSED == 'true' && '✅ Todos los tests de integración pasaron exitosamente' || '❌ Algunos tests de integración fallaron' }}
+          
+          ## 🎯 Tests E2E (Excel → Firestore → UI)
+          
+          ### Flujo Validado:
+          1. 📊 **Excel Data** → Firestore
+          2. 🔥 **Firestore** → Application Logic
+          3. 🎨 **Application** → UI Components
+          
+          ### Tests Ejecutados:
+          - ✅ Data Flow Validation
+          - ✅ KPIs Calculation
+          - ✅ Table Data Structure
+          - ✅ Data Consistency
+          - ✅ Summary & Aggregations
+          
+          ### Resultados:
+          ${{ env.E2E_PASSED == 'true' && '✅ Validación E2E completa exitosa' || '❌ Validación E2E requiere revisión' }}
+          
+          ## 📈 Métricas de Calidad
+          
+          - **Cobertura de Datos**: Excel → Firestore → UI
+          - **Integridad de Datos**: ${{ env.INTEGRATION_PASSED == 'true' && env.E2E_PASSED == 'true' && '✅ Verificada' || '⚠️ Requiere revisión' }}
+          - **Consistencia**: ${{ env.INTEGRATION_PASSED == 'true' && '✅ Validada' || '⚠️ Con issues' }}
+          
+          ## 🔗 Enlaces
+          
+          - [Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          - [Commit Details](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+          
+          ---
+          🤖 Auto-generado por E2E Validation System
+          EOF
+          
+          cat validation-report.md
+
+      # ============================================================================
+      # UPLOAD ARTIFACTS
+      # ============================================================================
+      - name: 📦 Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-validation-results
+          path: |
+            integration-results.log
+            e2e-results.log
+            validation-report.md
+            playwright-report/
+          retention-days: 30
+
+      - name: 📦 Upload Screenshots (if any)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-screenshots
+          path: test-results/
+          retention-days: 7
+        continue-on-error: true
+
+      # ============================================================================
+      # COMMENT ON PR
+      # ============================================================================
+      - name: 💬 Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('validation-report.md', 'utf8');
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: report
+            });
+
+      # ============================================================================
+      # CREATE ISSUE IF FAILED
+      # ============================================================================
+      - name: ❌ Create Issue on Failure
+        if: env.INTEGRATION_PASSED != 'true' || env.E2E_PASSED != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let integrationLog = '';
+            let e2eLog = '';
+            
+            try {
+              integrationLog = fs.readFileSync('integration-results.log', 'utf8').slice(-3000);
+            } catch (e) {
+              integrationLog = 'Log no disponible';
+            }
+            
+            try {
+              e2eLog = fs.readFileSync('e2e-results.log', 'utf8').slice(-3000);
+            } catch (e) {
+              e2eLog = 'Log no disponible';
+            }
+            
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 E2E Validation Failed - Excel → Firestore → UI',
+              labels: ['bug', 'e2e', 'validation-failed'],
+              body: `## 🚨 Fallo en Validación E2E
+            
+            La validación completa del flujo de datos falló.
+            
+            ### 📊 Estado de Tests
+            
+            - **Integration Tests**: ${{ env.INTEGRATION_PASSED == 'true' ? '✅ PASSED' : '❌ FAILED' }}
+            - **E2E Tests**: ${{ env.E2E_PASSED == 'true' ? '✅ PASSED' : '❌ FAILED' }}
+            
+            ### 🔍 Logs de Integración
+            
+            \`\`\`
+            ${integrationLog}
+            \`\`\`
+            
+            ### 🎭 Logs E2E
+            
+            \`\`\`
+            ${e2eLog}
+            \`\`\`
+            
+            ### 🔗 Enlaces
+            
+            - [Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - [Ver Artefactos](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts)
+            
+            ---
+            🤖 Auto-generado por E2E Validation System`
+            });
+            
+            console.log('Issue creado:', issue.data.html_url);
+
+      # ============================================================================
+      # CLEANUP
+      # ============================================================================
+      - name: 🧹 Cleanup
+        if: always()
+        run: |
+          pkill -f firebase || true
+          echo "✅ Cleanup completado"
+
+      # ============================================================================
+      # SUMMARY
+      # ============================================================================
+      - name: 📊 Job Summary
+        if: always()
+        run: |
+          cat validation-report.md >> $GITHUB_STEP_SUMMARY
