@@ -30,8 +30,10 @@ import {
     onSnapshot,
     orderBy,
     query,
+    runTransaction,
     serverTimestamp,
-    updateDoc
+    updateDoc,
+    where
 } from 'firebase/firestore'
 import { db } from '../config/firebase'
 
@@ -191,10 +193,7 @@ export async function crearIngreso(bancoId, data) {
 
     const docRef = await addDoc(collection(db, collections.ingresos), ingreso)
 
-    return {
-      id: docRef.id,
-      ...ingreso
-    }
+    return docRef.id
   } catch (error) {
     console.error('Error creando ingreso:', error)
     throw error
@@ -309,10 +308,7 @@ export async function crearGasto(bancoId, data) {
 
     const docRef = await addDoc(collection(db, collections.gastos), gasto)
 
-    return {
-      id: docRef.id,
-      ...gasto
-    }
+    return docRef.id
   } catch (error) {
     console.error('Error creando gasto:', error)
     throw error
@@ -396,6 +392,235 @@ export async function calcularTotalesBanco(bancoId) {
     }
   }
 }
+
+// ==================== MISSING FUNCTIONS (COMPATIBILIDAD) ====================
+
+/**
+ * Obtener un banco específico por ID
+ * @param {string} bancoId - ID del banco
+ * @returns {Promise<Object>} Datos del banco
+ */
+export async function getBanco(bancoId) {
+  try {
+    if (!BANCO_COLLECTIONS[bancoId]) {
+      throw new Error(`Banco no encontrado: ${bancoId}`)
+    }
+
+    const totales = await calcularTotalesBanco(bancoId)
+    
+    return {
+      id: bancoId,
+      nombre: BANCO_NAMES[bancoId],
+      capitalActual: totales.balance,
+      historicoIngresos: totales.totalIngresos,
+      historicoGastos: totales.totalGastos,
+      ...totales
+    }
+  } catch (error) {
+    console.error('Error obteniendo banco:', error)
+    throw error
+  }
+}
+
+/**
+ * Obtener todos los bancos disponibles
+ * @returns {Promise<Array>} Lista de bancos
+ */
+export async function getTodosBancos() {
+  try {
+    const bancoIds = getAllBancosIds()
+    const bancosPromises = bancoIds.map(id => getBanco(id).catch(() => null))
+    const bancos = await Promise.all(bancosPromises)
+    
+    return bancos.filter(Boolean)
+  } catch (error) {
+    console.error('Error obteniendo todos los bancos:', error)
+    return []
+  }
+}
+
+/**
+ * Obtener movimientos bancarios con filtros
+ * @param {string} bancoId - ID del banco
+ * @param {Object} filters - Filtros opcionales
+ * @returns {Promise<Array>} Lista de movimientos
+ */
+export async function getMovimientosBancarios(bancoId, filters = {}) {
+  try {
+    const [ingresos, gastos] = await Promise.all([
+      getIngresos(bancoId),
+      getGastos(bancoId)
+    ])
+
+    let movimientos = [
+      ...ingresos.map(ing => ({
+        ...ing,
+        tipo: 'INGRESO',
+        monto: parseFloat(ing.Ingreso || ing.ingreso || 0)
+      })),
+      ...gastos.map(gas => ({
+        ...gas,
+        tipo: 'GASTO',
+        monto: parseFloat(gas.Gasto || gas.gasto || 0)
+      }))
+    ]
+
+    // Aplicar filtros
+    if (filters.tipo) {
+      movimientos = movimientos.filter(m => m.tipo === filters.tipo)
+    }
+
+    // Ordenar por fecha descendente
+    movimientos.sort((a, b) => {
+      const dateA = a.fecha || new Date(0)
+      const dateB = b.fecha || new Date(0)
+      return dateB - dateA
+    })
+
+    return movimientos
+  } catch (error) {
+    console.error('Error obteniendo movimientos bancarios:', error)
+    return []
+  }
+}
+
+/**
+ * Obtener transferencias de un banco
+ * @param {string} bancoId - ID del banco
+ * @returns {Promise<Array>} Lista de transferencias
+ */
+export async function getTransferencias(bancoId) {
+  try {
+    return await getMovimientosBancarios(bancoId, { tipo: 'TRANSFERENCIA_ENTRADA' })
+  } catch (error) {
+    console.error('Error obteniendo transferencias:', error)
+    return []
+  }
+}
+
+/**
+ * Crear una transferencia entre bancos
+ * @param {Object} data - Datos de la transferencia
+ * @returns {Promise<Object>} Resultado de la transferencia
+ */
+export async function crearTransferencia(data) {
+  try {
+    const { bancoOrigen, bancoDestino, monto, concepto, fecha = new Date() } = data
+
+    // Validar bancos
+    if (!BANCO_COLLECTIONS[bancoOrigen] || !BANCO_COLLECTIONS[bancoDestino]) {
+      throw new Error('Bancos inválidos')
+    }
+
+    // Validar monto
+    if (!monto || monto <= 0) {
+      throw new Error('Monto inválido')
+    }
+
+    // Obtener saldo del banco origen
+    const bancoOrigenData = await getBanco(bancoOrigen)
+    if (bancoOrigenData.capitalActual < monto) {
+      throw new Error('Fondos insuficientes en banco origen')
+    }
+
+    // Crear gasto en banco origen
+    await crearGasto(bancoOrigen, {
+      Concepto: concepto || `Transferencia a ${BANCO_NAMES[bancoDestino]}`,
+      Gasto: monto,
+      Fecha: fecha,
+      Categoria: 'Transferencia',
+      Referencia: `TRANSFER_TO_${bancoDestino}`,
+      tipo: 'TRANSFERENCIA_SALIDA'
+    })
+
+    // Crear ingreso en banco destino
+    await crearIngreso(bancoDestino, {
+      Concepto: concepto || `Transferencia desde ${BANCO_NAMES[bancoOrigen]}`,
+      Ingreso: monto,
+      Fecha: fecha,
+      Referencia: `TRANSFER_FROM_${bancoOrigen}`,
+      tipo: 'TRANSFERENCIA_ENTRADA'
+    })
+
+    return {
+      success: true,
+      bancoOrigen,
+      bancoDestino,
+      monto,
+      fecha
+    }
+  } catch (error) {
+    console.error('Error creando transferencia:', error)
+    throw error
+  }
+}
+
+/**
+ * Obtener saldo total de todos los bancos
+ * @returns {Promise<number>} Saldo total
+ */
+export async function getSaldoTotalBancos() {
+  try {
+    const bancos = await getTodosBancos()
+    return bancos.reduce((total, banco) => total + (banco.capitalActual || 0), 0)
+  } catch (error) {
+    console.error('Error obteniendo saldo total:', error)
+    return 0
+  }
+}
+
+/**
+ * Crear cuenta bancaria (alias de getTodosBancos para compatibilidad)
+ * @param {Object} data - Datos de la cuenta
+ * @returns {Promise<Object>} Cuenta creada
+ */
+export async function createCuentaBancaria(data) {
+  console.warn('createCuentaBancaria no está implementado - los bancos son estáticos')
+  throw new Error('No se pueden crear bancos dinámicamente en esta versión')
+}
+
+/**
+ * Actualizar cuenta bancaria
+ * @param {string} bancoId - ID del banco
+ * @param {Object} data - Datos a actualizar
+ * @returns {Promise<boolean>} Éxito de la operación
+ */
+export async function updateCuentaBancaria(bancoId, data) {
+  console.warn('updateCuentaBancaria no está implementado - los bancos son estáticos')
+  throw new Error('No se pueden actualizar bancos en esta versión')
+}
+
+/**
+ * Eliminar cuenta bancaria
+ * @param {string} bancoId - ID del banco
+ * @returns {Promise<boolean>} Éxito de la operación
+ */
+export async function deleteCuentaBancaria(bancoId) {
+  console.warn('deleteCuentaBancaria no está implementado - los bancos son estáticos')
+  throw new Error('No se pueden eliminar bancos en esta versión')
+}
+
+// ==================== ALIASES DE COMPATIBILIDAD ====================
+
+/**
+ * Alias: getCuentasBancarias -> getTodosBancos
+ */
+export const getCuentasBancarias = getTodosBancos
+
+/**
+ * Alias: getCuentaBancaria -> getBanco
+ */
+export const getCuentaBancaria = getBanco
+
+/**
+ * Alias: createMovimientoBancario -> crearIngreso
+ */
+export const createMovimientoBancario = crearIngreso
+
+/**
+ * Alias: deleteMovimientoBancario -> eliminarIngreso
+ */
+export const deleteMovimientoBancario = eliminarIngreso
 
 // ==================== UTILIDADES ====================
 

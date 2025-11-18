@@ -1,0 +1,61 @@
+{
+  "version": "3.0.0",
+  "timestamp": "2025-11-13T12:20:00.000Z",
+  "description": "Base de datos unificada del sistema FlowDistributor",
+  "bancos": [
+    {
+      "id": "boveda-monte",
+      "nombre": "Bóveda Monte",
+      "capitalActual": 150000,
+      "historicoIngresos": 0,
+      "historicoGastos": 0
+    },
+    {
+      "id": "boveda-usa",
+      "nombre": "Bóveda USA",
+      "capitalActual": 80000,
+      "historicoIngresos": 0,
+      "historicoGastos": 0
+    },
+    {
+      "id": "utilidades",
+      "nombre": "Utilidades",
+      "capitalActual": 45000,
+      "historicoIngresos": 0,
+      "historicoGastos": 0
+    },
+    {
+      "id": "fletes",
+      "nombre": "Fletes",
+      "capitalActual": 25000,
+      "historicoIngresos": 0,
+      "historicoGastos": 0
+    },
+    {
+      "id": "azteca",
+      "nombre": "Azteca",
+      "capitalActual": 32000,
+      "historicoIngresos": 0,
+      "historicoGastos": 0
+    },
+    {
+      "id": "leftie",
+      "nombre": "Leftie",
+      "capitalActual": 18000,
+      "historicoIngresos": 0,
+      "historicoGastos": 0
+    },
+    {
+      "id": "profit",
+      "nombre": "Profit",
+      "capitalActual": 28000,
+      "historicoIngresos": 0,
+      "historicoGastos": 0
+    }
+  ],
+  "clientes": [],
+  "distribuidores": [],
+  "productos": [],
+  "ventas": [],
+  "compras": []
+}

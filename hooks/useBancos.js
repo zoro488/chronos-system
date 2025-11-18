@@ -4,10 +4,24 @@
  * ║          Hook actualizado para usar colecciones Firestore reales          ║
  * ╚════════════════════════════════════════════════════════════════════════════╝
  */
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
 import * as BancosService from '../services/bancos-v2.service'
+
+// Try to import toast - fallback to console if not available
+let toast = {
+  success: (msg) => console.log('✅', msg),
+  error: (msg) => console.error('❌', msg)
+}
+
+try {
+  const toastModule = require('react-hot-toast')
+  if (toastModule.default) {
+    toast = toastModule.default
+  }
+} catch (e) {
+  // Fallback already set
+}
 
 // ==================== QUERY KEYS ====================
 export const BANCOS_KEYS = {
@@ -19,8 +33,10 @@ export const BANCOS_KEYS = {
   movimientos: (bancoId) => [...BANCOS_KEYS.all, 'movimientos', bancoId],
   ingresos: (bancoId) => [...BANCOS_KEYS.all, 'ingresos', bancoId],
   gastos: (bancoId) => [...BANCOS_KEYS.all, 'gastos', bancoId],
+  transferencias: (bancoId) => [...BANCOS_KEYS.all, 'transferencias', bancoId],
   saldos: () => [...BANCOS_KEYS.all, 'saldos'],
   rfActual: () => [...BANCOS_KEYS.all, 'rfActual'],
+  balance: () => [...BANCOS_KEYS.all, 'balance'],
 }
 
 // ==================== HOOK PRINCIPAL ====================
@@ -33,6 +49,13 @@ export const BANCOS_KEYS = {
  */
 export function useBanco(bancoId, { realTime = false } = {}) {
   const queryClient = useQueryClient()
+
+  // Query para obtener banco
+  const { data: banco, isLoading: cargandoBanco } = useQuery({
+    queryKey: BANCOS_KEYS.detail(bancoId),
+    queryFn: () => BancosService.getBanco(bancoId),
+    enabled: !!bancoId,
+  })
 
   // Obtener ingresos (con o sin tiempo real)
   const [ingresosRealTime, setIngresosRealTime] = useState([])
@@ -76,17 +99,32 @@ export function useBanco(bancoId, { realTime = false } = {}) {
     staleTime: 1 * 60 * 1000,
   })
 
+  // Query para transferencias
+  const { data: transferencias = [], isLoading: cargandoTransferencias } = useQuery({
+    queryKey: BANCOS_KEYS.transferencias(bancoId),
+    queryFn: () => BancosService.getTransferencias(bancoId),
+    enabled: !!bancoId,
+  })
+
+  // Query para totales
+  const { data: totales = {} } = useQuery({
+    queryKey: ['totales', bancoId],
+    queryFn: () => BancosService.calcularTotalesBanco(bancoId),
+    enabled: !!bancoId,
+  })
+
   // Crear ingreso
   const crearIngreso = useMutation({
     mutationFn: (data) => BancosService.crearIngreso(bancoId, data),
     onSuccess: () => {
       if (!realTime) {
         queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.ingresos(bancoId) })
+        queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.detail(bancoId) })
       }
-      toast.success('Ingreso creado exitosamente')
+      toast.success('✅ Ingreso creado exitosamente')
     },
     onError: (error) => {
-      toast.error('Error al crear ingreso')
+      toast.error(`❌ Error al crear ingreso: ${error.message}`)
       console.error(error)
     },
   })
@@ -98,10 +136,10 @@ export function useBanco(bancoId, { realTime = false } = {}) {
       if (!realTime) {
         queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.ingresos(bancoId) })
       }
-      toast.success('Ingreso actualizado exitosamente')
+      toast.success('✅ Ingreso actualizado exitosamente')
     },
     onError: (error) => {
-      toast.error('Error al actualizar ingreso')
+      toast.error(`❌ Error al actualizar ingreso: ${error.message}`)
       console.error(error)
     },
   })
@@ -112,11 +150,12 @@ export function useBanco(bancoId, { realTime = false } = {}) {
     onSuccess: () => {
       if (!realTime) {
         queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.gastos(bancoId) })
+        queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.detail(bancoId) })
       }
-      toast.success('Gasto creado exitosamente')
+      toast.success('✅ Gasto creado exitosamente')
     },
     onError: (error) => {
-      toast.error('Error al crear gasto')
+      toast.error(`❌ Error al crear gasto: ${error.message}`)
       console.error(error)
     },
   })
@@ -128,11 +167,23 @@ export function useBanco(bancoId, { realTime = false } = {}) {
       if (!realTime) {
         queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.gastos(bancoId) })
       }
-      toast.success('Gasto actualizado exitosamente')
+      toast.success('✅ Gasto actualizado exitosamente')
     },
     onError: (error) => {
-      toast.error('Error al actualizar gasto')
+      toast.error(`❌ Error al actualizar gasto: ${error.message}`)
       console.error(error)
+    },
+  })
+
+  // Crear transferencia
+  const crearTransferencia = useMutation({
+    mutationFn: (data) => BancosService.crearTransferencia({ ...data, bancoOrigen: bancoId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.all })
+      toast.success('✅ Transferencia realizada')
+    },
+    onError: (error) => {
+      toast.error(`❌ Error: ${error.message}`)
     },
   })
 
@@ -142,11 +193,12 @@ export function useBanco(bancoId, { realTime = false } = {}) {
     onSuccess: () => {
       if (!realTime) {
         queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.ingresos(bancoId) })
+        queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.detail(bancoId) })
       }
-      toast.success('Ingreso eliminado')
+      toast.success('🗑️ Ingreso eliminado')
     },
     onError: (error) => {
-      toast.error('Error al eliminar ingreso')
+      toast.error(`❌ Error al eliminar ingreso: ${error.message}`)
       console.error(error)
     },
   })
@@ -157,131 +209,36 @@ export function useBanco(bancoId, { realTime = false } = {}) {
     onSuccess: () => {
       if (!realTime) {
         queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.gastos(bancoId) })
+        queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.detail(bancoId) })
       }
-      toast.success('Gasto eliminado')
+      toast.success('🗑️ Gasto eliminado')
     },
     onError: (error) => {
-      toast.error('Error al eliminar gasto')
+      toast.error(`❌ Error al eliminar gasto: ${error.message}`)
       console.error(error)
     },
   })
-import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { invalidateQueries, queryKeys } from '../lib/react-query';
-// ✅ Servicios reales de Firebase
-import * as BancosService from '../services/bancos.service';
-import { toast } from '../stores/useChronosStore';
-
-// ==================== QUERIES ====================
-
-/**
- * Hook para obtener banco completo con todos sus datos
- * Compatible con BancosPageComplete
- */
-export function useBanco(bancoId) {
-  // Query para obtener banco
-  const { data: banco, isLoading: cargandoBanco } = useQuery({
-    queryKey: ['banco', bancoId],
-    queryFn: () => BancosService.getBanco(bancoId),
-    enabled: !!bancoId,
-  });
-
-  // Query para ingresos
-  const { data: ingresos = [], isLoading: cargandoIngresos } = useQuery({
-    queryKey: ['ingresos', bancoId],
-    queryFn: () => BancosService.getIngresos(bancoId),
-    enabled: !!bancoId,
-  });
-
-  // Query para gastos
-  const { data: gastos = [], isLoading: cargandoGastos } = useQuery({
-    queryKey: ['gastos', bancoId],
-    queryFn: () => BancosService.getGastos(bancoId),
-    enabled: !!bancoId,
-  });
-
-  // Query para transferencias
-  const { data: transferencias = [], isLoading: cargandoTransferencias } = useQuery({
-    queryKey: ['transferencias', bancoId],
-    queryFn: () => BancosService.getTransferencias(bancoId),
-    enabled: !!bancoId,
-  });
-
-  // Mutation para crear ingreso
-  const crearIngreso = useMutation({
-    mutationFn: (data) => BancosService.crearIngreso({ ...data, bancoId }),
-    onSuccess: () => {
-      invalidateQueries.bancos();
-      toast.success('✅ Ingreso creado');
-    },
-    onError: (error) => {
-      toast.error(`❌ Error: ${error.message}`);
-    },
-  });
-
-  // Mutation para crear gasto
-  const crearGasto = useMutation({
-    mutationFn: (data) => BancosService.crearGasto({ ...data, bancoId }),
-    onSuccess: () => {
-      invalidateQueries.bancos();
-      toast.success('✅ Gasto creado');
-    },
-    onError: (error) => {
-      toast.error(`❌ Error: ${error.message}`);
-    },
-  });
-
-  // Mutation para crear transferencia
-  const crearTransferencia = useMutation({
-    mutationFn: (data) => BancosService.crearTransferencia({ ...data, bancoOrigenId: bancoId }),
-    onSuccess: () => {
-      invalidateQueries.bancos();
-      toast.success('✅ Transferencia realizada');
-    },
-    onError: (error) => {
-      toast.error(`❌ Error: ${error.message}`);
-    },
-  });
-
-  // Mutation para eliminar ingreso
-  const eliminarIngreso = useMutation({
-    mutationFn: (ingresoId) => BancosService.eliminarIngreso(ingresoId, bancoId),
-    onSuccess: () => {
-      invalidateQueries.bancos();
-      toast.success('🗑️ Ingreso eliminado');
-    },
-    onError: (error) => {
-      toast.error(`❌ Error: ${error.message}`);
-    },
-  });
-
-  // Mutation para eliminar gasto
-  const eliminarGasto = useMutation({
-    mutationFn: (gastoId) => BancosService.eliminarGasto(gastoId, bancoId),
-    onSuccess: () => {
-      invalidateQueries.bancos();
-      toast.success('🗑️ Gasto eliminado');
-    },
-    onError: (error) => {
-      toast.error(`❌ Error: ${error.message}`);
-    },
-  });
-
-  const cargando = cargandoBanco || cargandoIngresos || cargandoGastos || cargandoTransferencias;
+  const ingresos = realTime ? ingresosRealTime : (ingresosQuery.data || [])
+  const gastos = realTime ? gastosRealTime : (gastosQuery.data || [])
+  const cargando = cargandoBanco || ingresosQuery.isLoading || gastosQuery.isLoading || cargandoTransferencias
 
   return {
     banco,
     ingresos,
     gastos,
     transferencias,
+    totales,
     crearIngreso,
     crearGasto,
     crearTransferencia,
+    actualizarIngreso,
+    actualizarGasto,
     eliminarIngreso,
     eliminarGasto,
     cargando,
     error: null,
-  };
+  }
 }
 
 /**
@@ -290,42 +247,37 @@ export function useBanco(bancoId) {
  */
 export function useBancos() {
   const { data: bancos = [], isLoading: cargando } = useQuery({
-    queryKey: ['bancos'],
+    queryKey: BANCOS_KEYS.lists(),
     queryFn: () => BancosService.getTodosBancos(),
-  });
+  })
 
-  return { bancos, cargando };
+  return { bancos, cargando }
 }
 
 /**
  * Hook para obtener movimientos bancarios
  */
-export function useMovimientosBancarios(filters = {}) {
+export function useMovimientosBancarios(bancoId, filters = {}) {
   return useQuery({
-    queryKey: queryKeys.bancos.list(filters),
-    queryFn: () => BancosService.getMovimientosBancarios(filters),
-  });
+    queryKey: BANCOS_KEYS.movimientos(bancoId),
+    queryFn: () => BancosService.getMovimientosBancarios(bancoId, filters),
+    enabled: !!bancoId,
+  })
 }
 
 /**
- * Hook para obtener cuentas bancarias
+ * Hook para obtener cuentas bancarias (alias de useBancos)
  */
 export function useCuentasBancarias() {
-  return useQuery({
-    queryKey: queryKeys.bancos.lists(),
-    queryFn: () => BancosService.getCuentasBancarias(),
-  });
+  return useBancos()
 }
 
 /**
- * Hook para obtener cuenta bancaria por ID
+ * Hook para obtener cuenta bancaria por ID (alias de useBanco)
  */
 export function useCuentaBancaria(cuentaId) {
-  return useQuery({
-    queryKey: queryKeys.bancos.detail(cuentaId),
-    queryFn: () => BancosService.getCuentaBancaria(cuentaId),
-    enabled: !!cuentaId,
-  });
+  const { banco, cargando } = useBanco(cuentaId)
+  return { data: banco, isLoading: cargando }
 }
 
 /**
@@ -333,91 +285,100 @@ export function useCuentaBancaria(cuentaId) {
  */
 export function useSaldoTotalBancos() {
   return useQuery({
-    queryKey: queryKeys.bancos.balance(),
+    queryKey: BANCOS_KEYS.balance(),
     queryFn: () => BancosService.getSaldoTotalBancos(),
     staleTime: 1 * 60 * 1000, // 1 minuto
-  });
+  })
 }
 
 // ==================== MUTATIONS ====================
 
 /**
- * Hook para crear movimiento bancario
+ * Hook para crear movimiento bancario (alias)
  */
 export function useCreateMovimientoBancario() {
+  const queryClient = useQueryClient()
+  
   return useMutation({
-    mutationFn: (movimientoData) => BancosService.createMovimientoBancario(movimientoData),
+    mutationFn: ({ bancoId, ...data }) => BancosService.createMovimientoBancario(bancoId, data),
     onSuccess: () => {
-      invalidateQueries.bancos();
-      invalidateQueries.dashboard();
-      toast.success('✅ Movimiento bancario registrado');
+      queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.all })
+      toast.success('✅ Movimiento bancario registrado')
     },
     onError: (error) => {
-      toast.error(`❌ Error al crear movimiento: ${error.message}`);
+      toast.error(`❌ Error al crear movimiento: ${error.message}`)
     },
-  });
+  })
 }
 
 /**
  * Hook para crear cuenta bancaria
  */
 export function useCreateCuentaBancaria() {
+  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (cuentaData) => BancosService.createCuentaBancaria(cuentaData),
     onSuccess: () => {
-      invalidateQueries.bancos();
-      toast.success('✅ Cuenta bancaria creada');
+      queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.all })
+      toast.success('✅ Cuenta bancaria creada')
     },
     onError: (error) => {
-      toast.error(`❌ Error al crear cuenta: ${error.message}`);
+      toast.error(`❌ Error al crear cuenta: ${error.message}`)
     },
-  });
+  })
 }
 
 /**
  * Hook para actualizar cuenta bancaria
  */
 export function useUpdateCuentaBancaria() {
+  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: ({ id, ...updates }) => BancosService.updateCuentaBancaria(id, updates),
     onSuccess: () => {
-      invalidateQueries.bancos();
-      toast.success('✅ Cuenta actualizada');
+      queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.all })
+      toast.success('✅ Cuenta actualizada')
     },
     onError: (error) => {
-      toast.error(`❌ Error al actualizar: ${error.message}`);
+      toast.error(`❌ Error al actualizar: ${error.message}`)
     },
-  });
+  })
 }
 
 /**
  * Hook para eliminar movimiento bancario
  */
 export function useDeleteMovimientoBancario() {
+  const queryClient = useQueryClient()
+  
   return useMutation({
-    mutationFn: (movimientoId) => BancosService.deleteMovimientoBancario(movimientoId),
+    mutationFn: ({ bancoId, movimientoId }) => BancosService.deleteMovimientoBancario(bancoId, movimientoId),
     onSuccess: () => {
-      invalidateQueries.bancos();
-      toast.success('🗑️ Movimiento eliminado');
+      queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.all })
+      toast.success('🗑️ Movimiento eliminado')
     },
     onError: (error) => {
-      toast.error(`❌ Error al eliminar: ${error.message}`);
+      toast.error(`❌ Error al eliminar: ${error.message}`)
     },
-  });
+  })
 }
 
 /**
  * Hook para eliminar cuenta bancaria
  */
 export function useDeleteCuentaBancaria() {
+  const queryClient = useQueryClient()
+  
   return useMutation({
     mutationFn: (cuentaId) => BancosService.deleteCuentaBancaria(cuentaId),
     onSuccess: () => {
-      invalidateQueries.bancos();
-      toast.success('🗑️ Cuenta eliminada');
+      queryClient.invalidateQueries({ queryKey: BANCOS_KEYS.all })
+      toast.success('🗑️ Cuenta eliminada')
     },
     onError: (error) => {
-      toast.error(`❌ Error al eliminar: ${error.message}`);
+      toast.error(`❌ Error al eliminar: ${error.message}`)
     },
-  });
+  })
 }
