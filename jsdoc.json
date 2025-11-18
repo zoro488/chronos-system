@@ -1,0 +1,51 @@
+{
+  "source": {
+    "include": [
+      "src/",
+      "components/",
+      "services/",
+      "utils/",
+      "hooks/",
+      "stores/",
+      "types/"
+    ],
+    "includePattern": ".+\\.js(doc|x)?$",
+    "excludePattern": "(node_modules/|docs/|dist/|build/|__tests__/|.*\\.test\\.js|.*\\.spec\\.js)"
+  },
+  "opts": {
+    "template": "node_modules/better-docs",
+    "encoding": "utf8",
+    "destination": "./docs/jsdoc/",
+    "recurse": true,
+    "readme": "README.md",
+    "verbose": true
+  },
+  "plugins": [
+    "plugins/markdown"
+  ],
+  "tags": {
+    "allowUnknownTags": true,
+    "dictionaries": ["jsdoc", "closure"]
+  },
+  "templates": {
+    "cleverLinks": true,
+    "monospaceLinks": false,
+    "default": {
+      "outputSourceFiles": true
+    },
+    "better-docs": {
+      "name": "CHRONOS System API Documentation",
+      "logo": "brand/chronos-logo.svg",
+      "title": "CHRONOS System",
+      "css": "styles/jsdoc.css",
+      "trackingCode": "",
+      "hideGenerator": false,
+      "navLinks": [
+        {
+          "label": "GitHub",
+          "href": "https://github.com/zoro488/chronos-system"
+        }
+      ]
+    }
+  }
+}
