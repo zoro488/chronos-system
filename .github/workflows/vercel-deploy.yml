@@ -18,7 +18,7 @@ jobs:
   deploy:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -54,7 +54,7 @@ jobs:
         with:
           script: |
             const deploymentUrl = '${{ steps.deploy.outputs.url }}';
-            
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -83,7 +83,7 @@ jobs:
               environment: context.eventName === 'push' ? 'production' : 'preview',
               required_contexts: []
             });
-            
+
             await github.rest.repos.createDeploymentStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,

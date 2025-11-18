@@ -17,7 +17,7 @@ jobs:
   lighthouse:
     name: Lighthouse Performance Audit
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -57,7 +57,7 @@ jobs:
               bestPractices: Math.round(r.summary['best-practices'] * 100),
               seo: Math.round(r.summary.seo * 100)
             }));
-            
+
             return summary;
 
       - name: Comment PR with Lighthouse results
@@ -66,17 +66,17 @@ jobs:
         with:
           script: |
             const summary = ${{ steps.lighthouse.outputs.result }};
-            
+
             let comment = '## 🚀 Lighthouse CI Results\n\n';
             comment += '| URL | Performance | Accessibility | Best Practices | SEO |\n';
             comment += '|-----|-------------|---------------|----------------|-----|\n';
-            
+
             summary.forEach(s => {
               comment += `| ${s.url} | ${s.performance}% | ${s.accessibility}% | ${s.bestPractices}% | ${s.seo}% |\n`;
             });
-            
+
             comment += '\n[View detailed report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})';
-            
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
