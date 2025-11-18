@@ -150,14 +150,22 @@ jobs:
           args: --verbose
         env:
           OUTPUT: CHANGELOG.md
+        continue-on-error: true
 
       - name: 📤 Commit Changelog
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add CHANGELOG.md
-          git diff --quiet && git diff --staged --quiet || git commit -m "📝 Update CHANGELOG"
-          git push
+          git add CHANGELOG.md || true
+          git diff --quiet && git diff --staged --quiet || git commit -m "📝 Update CHANGELOG" || true
+        continue-on-error: true
+        
+      - name: 🔄 Push Changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+        continue-on-error: true
 
   # ============================================================================
   # DEPLOY DOCUMENTATION
