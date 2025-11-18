@@ -36,7 +36,7 @@ import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart as R
 
 export default function AIPanelFullscreen({ isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState('chat');
-  const [message, setMessage, setMessage] = useState('');
+  const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([
     {
       id: 1,

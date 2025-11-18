@@ -37,7 +37,18 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const functions = getFunctions(app);
-export const remoteConfig = getRemoteConfig(app);
+
+// Remote Config with proper error handling for test environments
+let remoteConfig;
+try {
+  if (typeof indexedDB !== 'undefined') {
+    remoteConfig = getRemoteConfig(app);
+  }
+} catch (error) {
+  console.warn('Remote Config not available:', error.message);
+  remoteConfig = null;
+}
+export { remoteConfig };
 
 // Analytics y Performance (solo en producción)
 let analytics = null;
@@ -57,14 +68,18 @@ export { analytics, performance };
 // ============================================
 // PERSISTENCIA OFFLINE
 // ============================================
-if (typeof window !== 'undefined') {
-  enableIndexedDbPersistence(db).catch((err) => {
-    if (err.code === 'failed-precondition') {
-      console.warn('Persistencia offline no disponible: Múltiples pestañas abiertas');
-    } else if (err.code === 'unimplemented') {
-      console.warn('Persistencia offline no soportada en este navegador');
-    }
-  });
+if (typeof window !== 'undefined' && db && typeof enableIndexedDbPersistence === 'function') {
+  try {
+    enableIndexedDbPersistence(db).catch((err) => {
+      if (err.code === 'failed-precondition') {
+        console.warn('Persistencia offline no disponible: Múltiples pestañas abiertas');
+      } else if (err.code === 'unimplemented') {
+        console.warn('Persistencia offline no soportada en este navegador');
+      }
+    });
+  } catch (error) {
+    console.warn('Error setting up persistence:', error.message);
+  }
 }
 
 // ============================================
