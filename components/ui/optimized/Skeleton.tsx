@@ -10,6 +10,7 @@ export const Skeleton = ({ className = '', width = '100%', height = '20px' }: Sk
     className={`animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded-md ${className}`}
     style={{ width, height }}
   />
+);
 
 export const CardSkeleton = () => (
   <div className="bg-white rounded-lg shadow-md p-4 space-y-3">
