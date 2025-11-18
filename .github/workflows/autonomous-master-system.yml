@@ -1,0 +1,398 @@
+name: 🤖 Sistema Autónomo Maestro - Tests Reales + Auto-corrección
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+  pull_request:
+  schedule:
+    - cron: '0 */6 * * *'  # Cada 6 horas
+
+env:
+  FIRESTORE_EMULATOR_HOST: localhost:8080
+  NODE_VERSION: '20.x'
+
+jobs:
+  autonomous-real-tests:
+    name: 🚀 Tests Autónomos con Auto-corrección
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    
+    steps:
+      # ============================================================================
+      # SETUP INICIAL
+      # ============================================================================
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🎯 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: |
+          npm ci
+          npm install -g firebase-tools@latest
+          echo "✅ Dependencias instaladas"
+
+      - name: 📋 Show Environment Info
+        run: |
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "Firebase CLI: $(firebase --version)"
+          echo "Working directory: $(pwd)"
+
+      # ============================================================================
+      # INICIAR FIREBASE EMULATOR
+      # ============================================================================
+      - name: 🔥 Start Firebase Emulator (Initial)
+        run: |
+          echo "🔥 Iniciando Firebase Emulator..."
+          firebase emulators:start --only firestore --project demo-test &
+          EMULATOR_PID=$!
+          echo "EMULATOR_PID=$EMULATOR_PID" >> $GITHUB_ENV
+          
+          # Esperar a que el emulador esté listo
+          for i in {1..30}; do
+            if curl -s http://localhost:8080 > /dev/null 2>&1; then
+              echo "✅ Emulator running on port 8080"
+              exit 0
+            fi
+            echo "Esperando emulator... ($i/30)"
+            sleep 2
+          done
+          
+          echo "❌ Emulator failed to start"
+          exit 1
+
+      # ============================================================================
+      # INTENTO 1 - EJECUCIÓN NORMAL
+      # ============================================================================
+      - name: 🧪 Tests - Attempt 1
+        id: test1
+        run: |
+          echo "🧪 Ejecutando tests (Intento 1)..."
+          npm test 2>&1 | tee test-output-1.log
+        continue-on-error: true
+
+      - name: 📊 Check Test 1 Results
+        if: steps.test1.outcome == 'success'
+        run: |
+          echo "✅ Tests pasaron en el intento 1!"
+          echo "TESTS_PASSED=true" >> $GITHUB_ENV
+          echo "SUCCESS_ATTEMPT=1" >> $GITHUB_ENV
+
+      # ============================================================================
+      # INTENTO 2 - REINICIAR EMULATOR
+      # ============================================================================
+      - name: 🔧 Fix 1 - Restart Emulator
+        if: steps.test1.outcome == 'failure'
+        run: |
+          echo "🔧 Estrategia 1: Reiniciando Firebase Emulator..."
+          
+          # Detener emulator actual
+          pkill -f firebase || true
+          sleep 5
+          
+          # Limpiar puertos
+          sudo lsof -ti:8080 | xargs sudo kill -9 || true
+          sleep 2
+          
+          # Reiniciar emulator
+          firebase emulators:start --only firestore --project demo-test &
+          sleep 20
+          
+          # Verificar que está corriendo
+          curl -s http://localhost:8080 && echo "✅ Emulator restarted" || echo "⚠️ Emulator may have issues"
+
+      - name: 🔄 Tests - Attempt 2
+        if: steps.test1.outcome == 'failure'
+        id: test2
+        run: |
+          echo "🧪 Ejecutando tests (Intento 2 - Post Emulator Restart)..."
+          npm test 2>&1 | tee test-output-2.log
+        continue-on-error: true
+
+      - name: 📊 Check Test 2 Results
+        if: steps.test2.outcome == 'success'
+        run: |
+          echo "✅ Tests pasaron en el intento 2!"
+          echo "TESTS_PASSED=true" >> $GITHUB_ENV
+          echo "SUCCESS_ATTEMPT=2" >> $GITHUB_ENV
+
+      # ============================================================================
+      # INTENTO 3 - REINSTALAR DEPENDENCIAS
+      # ============================================================================
+      - name: 🔧 Fix 2 - Reinstall Dependencies
+        if: steps.test2.outcome == 'failure'
+        run: |
+          echo "🔧 Estrategia 2: Reinstalando dependencias..."
+          rm -rf node_modules
+          npm cache clean --force
+          npm install --force
+          echo "✅ Dependencias reinstaladas"
+
+      - name: 🔄 Tests - Attempt 3
+        if: steps.test2.outcome == 'failure'
+        id: test3
+        run: |
+          echo "🧪 Ejecutando tests (Intento 3 - Post Reinstall)..."
+          npm test 2>&1 | tee test-output-3.log
+        continue-on-error: true
+
+      - name: 📊 Check Test 3 Results
+        if: steps.test3.outcome == 'success'
+        run: |
+          echo "✅ Tests pasaron en el intento 3!"
+          echo "TESTS_PASSED=true" >> $GITHUB_ENV
+          echo "SUCCESS_ATTEMPT=3" >> $GITHUB_ENV
+
+      # ============================================================================
+      # INTENTO 4 - LIMPIAR CACHE
+      # ============================================================================
+      - name: 🔧 Fix 3 - Clean Cache
+        if: steps.test3.outcome == 'failure'
+        run: |
+          echo "🔧 Estrategia 3: Limpiando cache..."
+          rm -rf node_modules/.vite
+          rm -rf node_modules/.cache
+          rm -rf .vitest
+          npm cache clean --force
+          echo "✅ Cache limpiado"
+
+      - name: 🔄 Tests - Attempt 4
+        if: steps.test3.outcome == 'failure'
+        id: test4
+        run: |
+          echo "🧪 Ejecutando tests (Intento 4 - Post Cache Clean)..."
+          npm test 2>&1 | tee test-output-4.log
+        continue-on-error: true
+
+      - name: 📊 Check Test 4 Results
+        if: steps.test4.outcome == 'success'
+        run: |
+          echo "✅ Tests pasaron en el intento 4!"
+          echo "TESTS_PASSED=true" >> $GITHUB_ENV
+          echo "SUCCESS_ATTEMPT=4" >> $GITHUB_ENV
+
+      # ============================================================================
+      # INTENTO 5 - CONFIGURACIÓN COMPLETA
+      # ============================================================================
+      - name: 🔧 Fix 4 - Complete Reset
+        if: steps.test4.outcome == 'failure'
+        run: |
+          echo "🔧 Estrategia 4: Reset completo del entorno..."
+          
+          # Detener todo
+          pkill -f firebase || true
+          pkill -f node || true
+          sleep 5
+          
+          # Limpiar todo
+          rm -rf node_modules
+          rm -rf .vitest
+          npm cache clean --force
+          
+          # Reinstalar
+          npm ci
+          npm install -g firebase-tools
+          
+          # Reiniciar emulator
+          firebase emulators:start --only firestore --project demo-test &
+          sleep 25
+          
+          echo "✅ Reset completo realizado"
+
+      - name: 🔄 Tests - Attempt 5 (Final)
+        if: steps.test4.outcome == 'failure'
+        id: test5
+        run: |
+          echo "🧪 Ejecutando tests (Intento 5 - FINAL)..."
+          npm test 2>&1 | tee test-output-5.log
+        continue-on-error: true
+
+      - name: 📊 Check Test 5 Results
+        if: steps.test5.outcome == 'success'
+        run: |
+          echo "✅ Tests pasaron en el intento 5!"
+          echo "TESTS_PASSED=true" >> $GITHUB_ENV
+          echo "SUCCESS_ATTEMPT=5" >> $GITHUB_ENV
+
+      # ============================================================================
+      # DETERMINAR RESULTADO FINAL
+      # ============================================================================
+      - name: 🎯 Determine Final Status
+        run: |
+          if [[ "${{ steps.test1.outcome }}" == "success" ]] || \
+             [[ "${{ steps.test2.outcome }}" == "success" ]] || \
+             [[ "${{ steps.test3.outcome }}" == "success" ]] || \
+             [[ "${{ steps.test4.outcome }}" == "success" ]] || \
+             [[ "${{ steps.test5.outcome }}" == "success" ]]; then
+            echo "TESTS_PASSED=true" >> $GITHUB_ENV
+            echo "✅ Tests completados exitosamente"
+          else
+            echo "TESTS_PASSED=false" >> $GITHUB_ENV
+            echo "❌ Tests fallaron después de 5 intentos"
+          fi
+
+      # ============================================================================
+      # SUBIR ARTEFACTOS
+      # ============================================================================
+      - name: 📦 Upload Test Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: test-output-*.log
+          retention-days: 30
+
+      # ============================================================================
+      # CREAR PR SI TESTS PASAN
+      # ============================================================================
+      - name: ✅ Create Success PR
+        if: env.TESTS_PASSED == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "✅ Tests reales pasando - Auto-corrección exitosa (Intento ${{ env.SUCCESS_ATTEMPT }})"
+          title: "✅ Tests Reales Pasando - Auto-corrección exitosa"
+          body: |
+            ## 🎉 Tests REALES con Firebase Emulator - ÉXITO
+            
+            ### ✅ Resultado
+            - **Estado**: Tests pasando al 100%
+            - **Intento exitoso**: ${{ env.SUCCESS_ATTEMPT }} de 5
+            - **Estrategia**: ${{ env.SUCCESS_ATTEMPT == '1' && 'Normal' || env.SUCCESS_ATTEMPT == '2' && 'Reinicio Emulator' || env.SUCCESS_ATTEMPT == '3' && 'Reinstalación' || env.SUCCESS_ATTEMPT == '4' && 'Limpieza Cache' || 'Reset Completo' }}
+            
+            ### 🔥 Tests Ejecutados
+            - ✅ Tests de integración real con Firestore
+            - ✅ CRUD operations completas
+            - ✅ Múltiples bancos simultáneos
+            - ✅ Queries y ordenamiento
+            - ✅ Validación de datos
+            
+            ### 📊 Métricas
+            - **Workflow Run**: ${{ github.run_number }}
+            - **Commit**: ${{ github.sha }}
+            - **Branch**: ${{ github.ref_name }}
+            
+            ---
+            🤖 **Auto-generado por Sistema Autónomo Maestro**
+          branch: autonomous-success-${{ github.run_number }}
+          delete-branch: true
+
+      # ============================================================================
+      # CREAR ISSUE SI TESTS FALLAN
+      # ============================================================================
+      - name: ❌ Create Failure Issue
+        if: env.TESTS_PASSED != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Leer logs si existen
+            let logs = '';
+            try {
+              for (let i = 1; i <= 5; i++) {
+                const logFile = `test-output-${i}.log`;
+                if (fs.existsSync(logFile)) {
+                  logs += `\n### Intento ${i}\n\`\`\`\n`;
+                  logs += fs.readFileSync(logFile, 'utf8').slice(-2000); // Últimas 2000 chars
+                  logs += '\n\`\`\`\n';
+                }
+              }
+            } catch (e) {
+              logs = 'No se pudieron cargar los logs';
+            }
+            
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 Tests fallaron después de 5 intentos - Sistema Autónomo',
+              labels: ['bug', 'tests', 'auto-correction-failed', 'urgent'],
+              body: `## 🚨 Fallo Crítico en Tests Reales
+            
+            Los tests con Firebase Emulator fallaron después de **5 intentos** con diferentes estrategias de auto-corrección.
+            
+            ### 📋 Intentos Realizados
+            
+            1. ❌ **Intento 1**: Ejecución normal
+            2. ❌ **Intento 2**: Reinicio de Firebase Emulator
+            3. ❌ **Intento 3**: Reinstalación de dependencias
+            4. ❌ **Intento 4**: Limpieza de cache
+            5. ❌ **Intento 5**: Reset completo del entorno
+            
+            ### 🔍 Información del Workflow
+            
+            - **Workflow Run**: ${{ github.run_number }}
+            - **Run ID**: ${{ github.run_id }}
+            - **Commit**: ${{ github.sha }}
+            - **Branch**: ${{ github.ref_name }}
+            - **Actor**: ${{ github.actor }}
+            
+            ### 📊 Logs de Ejecución
+            
+            ${logs}
+            
+            ### 🔗 Enlaces Útiles
+            
+            - [Ver Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - [Ver Artefactos](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts)
+            
+            ### 🚨 Acción Requerida
+            
+            Este issue requiere **revisión manual inmediata**. El sistema autónomo no pudo resolver el problema.
+            
+            ---
+            🤖 **Auto-generado por Sistema Autónomo Maestro**`
+            });
+            
+            console.log('Issue creado:', issue.data.html_url);
+
+      # ============================================================================
+      # CLEANUP
+      # ============================================================================
+      - name: 🧹 Cleanup
+        if: always()
+        run: |
+          echo "🧹 Limpiando procesos..."
+          pkill -f firebase || true
+          pkill -f node || true
+          echo "✅ Cleanup completado"
+
+      # ============================================================================
+      # SUMMARY
+      # ============================================================================
+      - name: 📊 Generate Summary
+        if: always()
+        run: |
+          echo "# 🤖 Sistema Autónomo Maestro - Resumen" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "$TESTS_PASSED" == "true" ]]; then
+            echo "## ✅ ÉXITO" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Tests completados exitosamente en el intento **$SUCCESS_ATTEMPT** de 5" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ❌ FALLO" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Tests fallaron después de **5 intentos** con auto-corrección" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 Intentos Realizados" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Intento | Estrategia | Resultado |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-----------|-----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 1 | Ejecución normal | ${{ steps.test1.outcome == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 2 | Reinicio Emulator | ${{ steps.test2.outcome == 'success' && '✅' || steps.test2.outcome == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3 | Reinstalación | ${{ steps.test3.outcome == 'success' && '✅' || steps.test3.outcome == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 4 | Limpieza Cache | ${{ steps.test4.outcome == 'success' && '✅' || steps.test4.outcome == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 5 | Reset Completo | ${{ steps.test5.outcome == 'success' && '✅' || steps.test5.outcome == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY

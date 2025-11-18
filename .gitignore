@@ -8,6 +8,17 @@ coverage/
 .nyc_output/
 playwright-report/
 test-results/
+.vitest/
+test-output-*.log
+integration-results.log
+e2e-results.log
+validation-report.md
+
+# Firebase Emulator
+emulator-data/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
 
 # Production
 dist/
