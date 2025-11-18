@@ -148,7 +148,7 @@ export default function UltraHeader({ onMenuToggle }) {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-orange-500" />
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-orange-500" />
                 <span className="hidden md:inline text-sm font-medium">Admin</span>
               </motion.button>
 
@@ -233,7 +233,7 @@ function GlobalSearchModal({ query, onQueryChange, onClose, searchRef }) {
               className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/5 cursor-pointer"
               whileHover={{ x: 4 }}
             >
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
                 {result.type[0]}
               </div>
               <div className="flex-1">

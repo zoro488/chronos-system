@@ -80,7 +80,7 @@ const useLockBodyScroll = (lock) => {
  */
 const buttonVariants = {
   primary: {
-    base: `bg-gradient-to-r from-[${tokens.colors.chronos.blue}] via-[${tokens.colors.chronos.purple}] to-[${tokens.colors.chronos.purple}]`,
+    base: `bg-gradient-to-r from-[${tokens.colors.chronos.blue}] via-[${tokens.colors.chronos.cyan}] to-[${tokens.colors.chronos.cyan}]`,
     hover: 'hover:shadow-[0_0_30px_rgba(102,126,234,0.6)] hover:scale-105',
     active: 'active:scale-95',
     disabled: 'opacity-50 cursor-not-allowed',

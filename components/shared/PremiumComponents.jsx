@@ -77,10 +77,10 @@ export const AnimatedStatCard = ({
   const colorClasses = {
     green: 'from-emerald-500/20 to-emerald-500/5 border-emerald-500/30',
     cyan: 'from-cyan-500/20 to-cyan-500/5 border-cyan-500/30',
-    purple: 'from-purple-500/20 to-purple-500/5 border-purple-500/30',
+    cyan: 'from-blue-500/20 to-blue-500/5 border-blue-500/30',
     orange: 'from-orange-500/20 to-orange-500/5 border-orange-500/30',
     blue: 'from-blue-500/20 to-blue-500/5 border-blue-500/30',
-    pink: 'from-pink-500/20 to-pink-500/5 border-pink-500/30',
+    teal: 'from-cyan-500/20 to-cyan-500/5 border-cyan-500/30',
     yellow: 'from-yellow-500/20 to-yellow-500/5 border-yellow-500/30',
     red: 'from-red-500/20 to-red-500/5 border-red-500/30',
   };
@@ -88,10 +88,10 @@ export const AnimatedStatCard = ({
   const iconColorClasses = {
     green: 'text-emerald-400',
     cyan: 'text-cyan-400',
-    purple: 'text-purple-400',
+    cyan: 'text-blue-400',
     orange: 'text-orange-400',
     blue: 'text-blue-400',
-    pink: 'text-pink-400',
+    teal: 'text-cyan-400',
     yellow: 'text-yellow-400',
     red: 'text-red-400',
   };
@@ -99,10 +99,10 @@ export const AnimatedStatCard = ({
   const glowColors = {
     green: 'rgba(16, 185, 129, 0.5)',
     cyan: 'rgba(6, 182, 212, 0.5)',
-    purple: 'rgba(168, 85, 247, 0.5)',
+    cyan: 'rgba(168, 85, 247, 0.5)',
     orange: 'rgba(249, 115, 22, 0.5)',
     blue: 'rgba(59, 130, 246, 0.5)',
-    pink: 'rgba(236, 72, 153, 0.5)',
+    teal: 'rgba(236, 72, 153, 0.5)',
     yellow: 'rgba(234, 179, 8, 0.5)',
     red: 'rgba(239, 68, 68, 0.5)',
   };
@@ -263,7 +263,7 @@ export const PageHeader = ({
           whileHover="hover"
           whileTap="tap"
           onClick={onAction}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-xl text-white font-semibold shadow-lg shadow-cyan-500/50 hover:shadow-xl hover:shadow-cyan-500/70 transition-all"
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl text-white font-semibold shadow-lg shadow-cyan-500/50 hover:shadow-xl hover:shadow-cyan-500/70 transition-all"
         >
           <ActionIcon className="w-5 h-5" />
           {actionLabel}
@@ -297,7 +297,7 @@ export const FilterBar = ({
         />
         {/* Animated underline on focus */}
         <motion.div
-          className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 origin-left"
+          className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 origin-left"
           initial={{ scaleX: 0 }}
           whileFocus={{ scaleX: 1 }}
         />
@@ -422,7 +422,7 @@ export const EmptyState = ({
           whileHover="hover"
           whileTap="tap"
           onClick={onAction}
-          className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-xl text-white font-semibold shadow-lg"
+          className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl text-white font-semibold shadow-lg"
         >
           {actionLabel}
         </motion.button>

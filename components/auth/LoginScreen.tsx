@@ -73,7 +73,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-purple-900/20 via-slate-900 to-slate-950">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-blue-900/20 via-slate-900 to-slate-950">
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
@@ -86,7 +86,7 @@ export default function LoginScreen() {
             repeat: Infinity,
             ease: 'linear',
           }}
-          className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-purple-500/20 blur-3xl"
+          className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-blue-500/20 blur-3xl"
         />
         <motion.div
           animate={{
@@ -98,7 +98,7 @@ export default function LoginScreen() {
             repeat: Infinity,
             ease: 'linear',
           }}
-          className="absolute -bottom-40 -right-40 h-80 w-80 rounded-full bg-pink-500/20 blur-3xl"
+          className="absolute -bottom-40 -right-40 h-80 w-80 rounded-full bg-cyan-500/20 blur-3xl"
         />
 
         {/* Animated grid */}
@@ -168,7 +168,7 @@ export default function LoginScreen() {
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Tu nombre"
-                  className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all backdrop-blur-xl"
+                  className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all backdrop-blur-xl"
                   disabled={loading}
                   autoComplete="name"
                 />
@@ -188,7 +188,7 @@ export default function LoginScreen() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="tu@email.com"
-                  className="w-full rounded-xl bg-white/5 border border-white/10 pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all backdrop-blur-xl"
+                  className="w-full rounded-xl bg-white/5 border border-white/10 pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all backdrop-blur-xl"
                   autoComplete="email"
                   disabled={loading}
                 />
@@ -208,7 +208,7 @@ export default function LoginScreen() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full rounded-xl bg-white/5 border border-white/10 pl-10 pr-12 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all backdrop-blur-xl"
+                  className="w-full rounded-xl bg-white/5 border border-white/10 pl-10 pr-12 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all backdrop-blur-xl"
                   autoComplete={isSignUp ? 'new-password' : 'current-password'}
                   disabled={loading}
                 />
@@ -241,7 +241,7 @@ export default function LoginScreen() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-3 font-semibold text-white shadow-lg shadow-purple-500/50 transition-all hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-xl hover:shadow-purple-500/60"
+              className="w-full rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-3 font-semibold text-white shadow-lg shadow-blue-500/50 transition-all hover:from-blue-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-xl hover:shadow-blue-500/60"
             >
               {loading ? (
                 <div className="flex items-center justify-center gap-2">
@@ -261,7 +261,7 @@ export default function LoginScreen() {
                   setIsSignUp(!isSignUp);
                   setLocalError('');
                 }}
-                className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+                className="text-sm text-blue-400 hover:text-cyan-300 transition-colors"
               >
                 {isSignUp ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}
               </button>
@@ -272,7 +272,7 @@ export default function LoginScreen() {
               <div className="text-center">
                 <button
                   type="button"
-                  className="text-sm text-gray-400 hover:text-purple-300 transition-colors"
+                  className="text-sm text-gray-400 hover:text-cyan-300 transition-colors"
                   onClick={() => {
                     if (email) {
                       toast.promise(

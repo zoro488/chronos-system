@@ -264,7 +264,7 @@ export default function AIPanelFullscreen({ isOpen, onClose }) {
           className="relative h-[90vh] w-[95vw] rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-800 dark:bg-gray-900 overflow-hidden"
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 bg-gradient-to-r from-purple-500 to-blue-500 p-6 text-white">
+          <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 bg-gradient-to-r from-blue-500 to-blue-500 p-6 text-white">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 backdrop-blur-xl">
                 <Sparkles className="h-6 w-6" />
@@ -300,7 +300,7 @@ export default function AIPanelFullscreen({ isOpen, onClose }) {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-all ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-500 text-white shadow-lg'
                     : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
                 }`}
               >
@@ -324,14 +324,14 @@ export default function AIPanelFullscreen({ isOpen, onClose }) {
                       className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : ''}`}
                     >
                       {msg.role === 'assistant' && (
-                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-blue-500">
+                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-500">
                           <Bot className="h-5 w-5 text-white" />
                         </div>
                       )}
                       <div
                         className={`max-w-[70%] rounded-2xl px-4 py-3 ${
                           msg.role === 'user'
-                            ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white'
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-500 text-white'
                             : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
                         }`}
                       >
@@ -354,7 +354,7 @@ export default function AIPanelFullscreen({ isOpen, onClose }) {
                       animate={{ opacity: 1 }}
                       className="flex gap-3"
                     >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-blue-500">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-500">
                         <Bot className="h-5 w-5 text-white" />
                       </div>
                       <div className="flex items-center gap-2 rounded-2xl bg-gray-100 dark:bg-gray-800 px-4 py-3">
@@ -378,11 +378,11 @@ export default function AIPanelFullscreen({ isOpen, onClose }) {
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     placeholder="Escribe tu pregunta..."
-                    className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-3 outline-none focus:border-purple-500 dark:border-gray-800 dark:bg-gray-900"
+                    className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-3 outline-none focus:border-blue-500 dark:border-gray-800 dark:bg-gray-900"
                   />
                   <button
                     onClick={handleSendMessage}
-                    className="flex-shrink-0 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 px-6 py-3 text-white hover:shadow-lg"
+                    className="flex-shrink-0 rounded-xl bg-gradient-to-r from-blue-500 to-blue-500 px-6 py-3 text-white hover:shadow-lg"
                   >
                     <Send className="h-5 w-5" />
                   </button>
@@ -419,7 +419,7 @@ export default function AIPanelFullscreen({ isOpen, onClose }) {
                     </div>
                     {renderChart(insight)}
                     <div className="mt-4 flex gap-2">
-                      <button className="flex items-center gap-1 text-sm text-gray-600 hover:text-purple-600">
+                      <button className="flex items-center gap-1 text-sm text-gray-600 hover:text-blue-600">
                         <Copy className="h-4 w-4" />
                         Copiar
                       </button>
@@ -445,8 +445,8 @@ export default function AIPanelFullscreen({ isOpen, onClose }) {
                     className="rounded-xl border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-800 dark:bg-gray-900"
                   >
                     <div className="mb-4 flex items-center justify-between">
-                      <Zap className="h-8 w-8 text-purple-500" />
-                      <span className="text-2xl font-bold text-purple-600">{pred.confidence}%</span>
+                      <Zap className="h-8 w-8 text-blue-500" />
+                      <span className="text-2xl font-bold text-blue-600">{pred.confidence}%</span>
                     </div>
                     <h3 className="mb-2 text-lg font-semibold">{pred.title}</h3>
                     <p className="mb-4 text-3xl font-bold text-gray-900 dark:text-white">{pred.value}</p>
@@ -498,7 +498,7 @@ export default function AIPanelFullscreen({ isOpen, onClose }) {
                           </div>
                         </div>
                       </div>
-                      <button className="rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 text-white hover:shadow-lg">
+                      <button className="rounded-lg bg-gradient-to-r from-blue-500 to-blue-500 px-4 py-2 text-white hover:shadow-lg">
                         {rec.action}
                       </button>
                     </div>

@@ -11,16 +11,16 @@ export const colors = {
   // Paleta CHRONOS Principal
   chronos: {
     blue: '#667eea',
-    purple: '#764ba2',
-    pink: '#f093fb',
-    redPink: '#f5576c',
+    cyan: '#4facfe',
+    teal: '#00f2fe',
+    indigo: '#3b82f6',
   },
 
   // Colores Semánticos
   primary: '#667eea',
-  secondary: '#764ba2',
-  accent: '#f093fb',
-  danger: '#f5576c',
+  secondary: '#4facfe',
+  accent: '#00f2fe',
+  danger: '#ef4444',
   warning: '#fbbf24',
   success: '#10b981',
   info: '#3b82f6',
@@ -57,13 +57,13 @@ export const colors = {
 
 export const gradients = {
   // Gradiente Principal CHRONOS
-  chronos: 'linear-gradient(135deg, #667eea 0%, #764ba2 40%, #f093fb 70%, #f5576c 100%)',
-  chronosRadial: 'radial-gradient(circle, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+  chronos: 'linear-gradient(135deg, #667eea 0%, #4facfe 50%, #00f2fe 100%)',
+  chronosRadial: 'radial-gradient(circle, #667eea 0%, #4facfe 50%, #00f2fe 100%)',
 
   // Variaciones
   blue: 'linear-gradient(135deg, #667eea 0%, #4facfe 100%)',
-  purple: 'linear-gradient(135deg, #764ba2 0%, #a770ef 100%)',
-  pink: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+  cyan: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+  indigo: 'linear-gradient(135deg, #3b82f6 0%, #667eea 100%)',
   cosmic: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #667eea 100%)',
 
   // Gradientes de Estado
@@ -74,7 +74,7 @@ export const gradients = {
 
   // Gradientes para Fondos
   darkBlue: 'linear-gradient(180deg, #0f0f19 0%, #1a1a2e 100%)',
-  darkPurple: 'linear-gradient(180deg, #1a1a2e 0%, #16213e 100%)',
+  darkCyan: 'linear-gradient(180deg, #0f1419 0%, #1a2a3e 100%)',
 
   // Glassmorphism overlays
   glass: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
@@ -98,8 +98,8 @@ export const shadows = {
   // Sombras de color (glow effects)
   glow: {
     blue: '0 0 20px rgba(102, 126, 234, 0.5)',
-    purple: '0 0 20px rgba(118, 75, 162, 0.5)',
-    pink: '0 0 20px rgba(240, 147, 251, 0.5)',
+    cyan: '0 0 20px rgba(79, 172, 254, 0.5)',
+    teal: '0 0 20px rgba(0, 242, 254, 0.5)',
     success: '0 0 20px rgba(16, 185, 129, 0.5)',
     danger: '0 0 20px rgba(239, 68, 68, 0.5)',
   },

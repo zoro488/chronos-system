@@ -214,7 +214,7 @@ export const BancosAnalytics = () => {
   const { bancosComparison, trendData, categoriasPie, heatmapData, kpis } = analyticsData;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950/20 to-purple-950/20 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950/20 to-blue-950/20 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -357,7 +357,7 @@ export const BancosAnalytics = () => {
             className="bg-slate-900/50 backdrop-blur-sm rounded-xl p-6 border border-slate-800"
           >
             <div className="flex items-center gap-2 mb-4">
-              <BarChart3 className="w-5 h-5 text-purple-400" />
+              <BarChart3 className="w-5 h-5 text-blue-400" />
               <h3 className="text-lg font-semibold text-white">
                 Gastos por Categoría
               </h3>

@@ -46,8 +46,8 @@ const cn = (...classes) => classes.filter(Boolean).join(' ');
 // Colores predefinidos para gráficos
 const CHART_COLORS = [
   tokens.colors.chronos.blue,
-  tokens.colors.chronos.purple,
-  tokens.colors.chronos.pink,
+  tokens.colors.chronos.cyan,
+  tokens.colors.chronos.teal,
   tokens.colors.success,
   tokens.colors.warning,
   tokens.colors.danger,

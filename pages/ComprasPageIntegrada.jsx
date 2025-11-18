@@ -65,12 +65,12 @@ export default function ComprasPageIntegrada() {
           <div className="flex items-center gap-4">
             <motion.div
               whileHover={{ scale: 1.05, rotate: 5 }}
-              className="p-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl shadow-2xl"
+              className="p-4 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl shadow-2xl"
             >
               <ShoppingCart className="w-8 h-8 text-white" />
             </motion.div>
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
                 Órdenes de Compra
               </h1>
               <p className="text-slate-400 mt-1">Gestión de compras a distribuidores</p>
@@ -81,7 +81,7 @@ export default function ComprasPageIntegrada() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowFormulario(true)}
-            className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold flex items-center gap-2 shadow-lg shadow-purple-500/50 hover:shadow-xl transition-all"
+            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-semibold flex items-center gap-2 shadow-lg shadow-blue-500/50 hover:shadow-xl transition-all"
           >
             <Plus className="w-5 h-5" />
             Nueva Orden
@@ -125,11 +125,11 @@ export default function ComprasPageIntegrada() {
 
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="p-5 bg-gradient-to-br from-purple-500/20 to-purple-500/5 border border-purple-500/30 rounded-2xl backdrop-blur-xl"
+            className="p-5 bg-gradient-to-br from-blue-500/20 to-blue-500/5 border border-blue-500/30 rounded-2xl backdrop-blur-xl"
           >
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-slate-400">Total Invertido</p>
-              <DollarSign className="w-5 h-5 text-purple-400" />
+              <DollarSign className="w-5 h-5 text-blue-400" />
             </div>
             <p className="text-3xl font-bold text-white">${totalMonto.toLocaleString()}</p>
           </motion.div>
@@ -144,7 +144,7 @@ export default function ComprasPageIntegrada() {
               onClick={() => setFiltro(f)}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 filtro === f
-                  ? 'bg-purple-500 text-white shadow-lg'
+                  ? 'bg-blue-500 text-white shadow-lg'
                   : 'bg-white/5 text-slate-400 hover:bg-white/10'
               }`}
             >
@@ -158,7 +158,7 @@ export default function ComprasPageIntegrada() {
       <div className="max-w-7xl mx-auto">
         {loading ? (
           <div className="text-center py-20">
-            <div className="animate-spin w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4" />
+            <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
             <p className="text-slate-400">Cargando órdenes...</p>
           </div>
         ) : ordenesFiltradas.length === 0 ? (
@@ -169,7 +169,7 @@ export default function ComprasPageIntegrada() {
             </p>
             <button
               onClick={() => setShowFormulario(true)}
-              className="mt-4 px-6 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-600 transition-all"
+              className="mt-4 px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all"
             >
               Crear Primera Orden
             </button>
@@ -181,7 +181,7 @@ export default function ComprasPageIntegrada() {
                 key={orden.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl hover:border-purple-500/50 transition-all group"
+                className="p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl hover:border-blue-500/50 transition-all group"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div>

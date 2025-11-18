@@ -77,11 +77,11 @@ import { CreateProductoSchema } from '../schemas';
 const CategoryBadge3D = ({ category }) => {
   const categoryColors = {
     Electrónica: 'from-blue-500 to-cyan-500',
-    Ropa: 'from-purple-500 to-pink-500',
+    Ropa: 'from-blue-500 to-cyan-500',
     Alimentos: 'from-orange-500 to-red-500',
     Hogar: 'from-green-500 to-emerald-500',
     Juguetes: 'from-yellow-500 to-orange-500',
-    Libros: 'from-indigo-500 to-purple-500',
+    Libros: 'from-blue-600 to-blue-500',
     Deportes: 'from-teal-500 to-cyan-500',
     Otro: 'from-gray-500 to-slate-500',
   };
@@ -152,7 +152,7 @@ const ProductCard = ({ producto, onEdit, onAjuste }) => {
       )}
 
       {/* Image Placeholder */}
-      <div className="relative h-48 bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center overflow-hidden">
+      <div className="relative h-48 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center overflow-hidden">
         {producto.imagen ? (
           <img src={producto.imagen} alt={producto.nombre} className="w-full h-full object-cover" />
         ) : (
@@ -477,7 +477,7 @@ const InventarioPage = () => {
               value={stats.unidadesTotales}
               format="number"
               trend={5.7}
-              color="purple"
+              color="blue"
               icon={Archive}
               delay={3}
             />
@@ -650,7 +650,7 @@ const InventarioPage = () => {
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4 flex-1">
-                      <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center">
                         {producto.imagen ? (
                           <img
                             src={producto.imagen}
@@ -811,7 +811,7 @@ const InventarioPage = () => {
               type="submit"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg text-white font-semibold shadow-lg"
+              className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg text-white font-semibold shadow-lg"
             >
               {editingProducto ? 'Actualizar' : 'Crear Producto'}
             </motion.button>

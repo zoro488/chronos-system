@@ -376,7 +376,7 @@ export const MasterDashboard = () => {
               value={kpis.ventasHoy}
               format="number"
               icon={ShoppingCart}
-              color="purple"
+              color="blue"
               size="lg"
             />
             <ChronosKPI
@@ -410,7 +410,7 @@ export const MasterDashboard = () => {
               value={kpis.inventarioBajo}
               format="number"
               icon={Package}
-              color="purple"
+              color="blue"
               size="lg"
             />
             <ChronosKPI
@@ -436,7 +436,7 @@ export const MasterDashboard = () => {
               value={kpis.clientesActivos}
               format="number"
               icon={Users}
-              color="purple"
+              color="blue"
               size="lg"
             />
           </div>

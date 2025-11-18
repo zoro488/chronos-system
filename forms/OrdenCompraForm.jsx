@@ -365,7 +365,7 @@ export const OrdenCompraForm = ({ ordenId = null, onSuccess, onCancel, className
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="p-6 rounded-2xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/50"
+        className="p-6 rounded-2xl bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/50"
       >
         <h3 className="text-lg font-semibold text-white mb-4">Resumen de Compra</h3>
         <div className="space-y-2 text-sm">

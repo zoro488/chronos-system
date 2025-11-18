@@ -272,7 +272,7 @@ export function MegaAIWidget({ userId, position = 'bottom-right', onClose }) {
       {!isOpen && (
         <motion.button
           onClick={() => setIsOpen(true)}
-          className={`fixed ${positionClasses[position]} z-50 w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-2xl flex items-center justify-center hover:scale-110 transition-transform`}
+          className={`fixed ${positionClasses[position]} z-50 w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-2xl flex items-center justify-center hover:scale-110 transition-transform`}
           whileHover={{ scale: 1.1, rotate: 5 }}
           whileTap={{ scale: 0.9 }}
           initial={{ scale: 0 }}
@@ -280,7 +280,7 @@ export function MegaAIWidget({ userId, position = 'bottom-right', onClose }) {
         >
           <Sparkles size={28} />
           <motion.div
-            className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 opacity-50"
+            className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 opacity-50"
             animate={{
               scale: [1, 1.2, 1],
               opacity: [0.5, 0.2, 0.5],
@@ -307,9 +307,9 @@ export function MegaAIWidget({ userId, position = 'bottom-right', onClose }) {
             exit="exit"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/10 bg-gradient-to-r from-blue-500/20 to-purple-600/20">
+            <div className="flex items-center justify-between p-4 border-b border-white/10 bg-gradient-to-r from-blue-500/20 to-blue-600/20">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                   <Sparkles size={20} className="text-white" />
                 </div>
                 <div>
@@ -355,7 +355,7 @@ export function MegaAIWidget({ userId, position = 'bottom-right', onClose }) {
                   <div
                     className={`max-w-[80%] p-3 rounded-xl ${
                       msg.role === 'user'
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
                         : 'bg-white/10 text-white backdrop-blur-xl'
                     }`}
                   >
@@ -512,7 +512,7 @@ export function MegaAIWidget({ userId, position = 'bottom-right', onClose }) {
 
                 <motion.button
                   onClick={handleSendMessage}
-                  className="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white disabled:opacity-50"
+                  className="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white disabled:opacity-50"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   disabled={isThinking || !input.trim()}

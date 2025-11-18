@@ -141,7 +141,7 @@ export default function FormularioPago({
   const esDistribuidor = tipo === 'distribuidor';
   const titulo = esDistribuidor ? 'Pago a Distribuidor' : 'Pago de Cliente';
   const gradiente = esDistribuidor
-    ? 'from-purple-500 via-pink-500 to-rose-500'
+    ? 'from-blue-500 via-cyan-500 to-cyan-500'
     : 'from-blue-500 via-cyan-500 to-teal-500';
   const iconoEntidad = esDistribuidor ? Building : User;
 
@@ -233,7 +233,7 @@ export default function FormularioPago({
             </label>
             <select
               {...register('entidadId')}
-              className="w-full px-4 py-3 bg-white/5 border-2 border-white/10 rounded-xl text-white focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all"
+              className="w-full px-4 py-3 bg-white/5 border-2 border-white/10 rounded-xl text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all"
             >
               <option value="">Seleccionar...</option>
               {entidades.map((entidad) => (
@@ -393,7 +393,7 @@ export default function FormularioPago({
             <label className="flex text-sm font-medium text-slate-300 mb-2">Referencia</label>
             <input
               {...register('referencia')}
-              className="w-full px-4 py-3 bg-white/5 border-2 border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all"
+              className="w-full px-4 py-3 bg-white/5 border-2 border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all"
               placeholder="Número de referencia o comprobante"
             />
           </div>
@@ -404,7 +404,7 @@ export default function FormularioPago({
             <textarea
               {...register('notas')}
               rows="2"
-              className="w-full px-4 py-3 bg-white/5 border-2 border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all resize-none"
+              className="w-full px-4 py-3 bg-white/5 border-2 border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all resize-none"
               placeholder="Notas adicionales..."
             />
           </div>

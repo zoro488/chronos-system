@@ -30,7 +30,7 @@ export default function ProtectedRoute({
   // ============================================================================
   if (loading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-purple-900/20 via-slate-900 to-slate-950">
+      <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-blue-900/20 via-slate-900 to-slate-950">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -39,9 +39,9 @@ export default function ProtectedRoute({
         >
           {/* Spinner Premium */}
           <div className="relative mx-auto mb-6 h-20 w-20">
-            <div className="absolute inset-0 rounded-full border-4 border-purple-500/20" />
+            <div className="absolute inset-0 rounded-full border-4 border-blue-500/20" />
             <motion.div
-              className="absolute inset-0 rounded-full border-4 border-purple-500 border-t-transparent"
+              className="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent"
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
             />
@@ -80,7 +80,7 @@ export default function ProtectedRoute({
 
     if (userRoleLevel < requiredRoleLevel) {
       return (
-        <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-purple-900/20 via-slate-900 to-slate-950">
+        <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-blue-900/20 via-slate-900 to-slate-950">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -104,7 +104,7 @@ export default function ProtectedRoute({
             <div className="mb-6 rounded-xl bg-white/5 p-4 backdrop-blur-xl border border-white/10">
               <p className="text-sm text-gray-300">
                 <span className="font-semibold">Rol requerido:</span>{' '}
-                <span className="text-purple-400 uppercase">{requiredRole}</span>
+                <span className="text-blue-400 uppercase">{requiredRole}</span>
               </p>
               <p className="mt-2 text-sm text-gray-300">
                 <span className="font-semibold">Tu rol actual:</span>{' '}
@@ -122,7 +122,7 @@ export default function ProtectedRoute({
               </button>
               <button
                 onClick={() => (window.location.href = '/dashboard')}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium transition-all shadow-lg shadow-purple-500/50"
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium transition-all shadow-lg shadow-blue-500/50"
               >
                 Ir al Dashboard
               </button>
@@ -145,7 +145,7 @@ export default function ProtectedRoute({
 
     if (!hasAllPermissions) {
       return (
-        <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-purple-900/20 via-slate-900 to-slate-950">
+        <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-blue-900/20 via-slate-900 to-slate-950">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -172,8 +172,8 @@ export default function ProtectedRoute({
               </p>
               <ul className="space-y-1">
                 {requiredPermissions.map((perm) => (
-                  <li key={perm} className="flex items-center gap-2 text-sm text-purple-400">
-                    <div className="h-1.5 w-1.5 rounded-full bg-purple-400" />
+                  <li key={perm} className="flex items-center gap-2 text-sm text-blue-400">
+                    <div className="h-1.5 w-1.5 rounded-full bg-blue-400" />
                     {perm}
                   </li>
                 ))}
@@ -190,7 +190,7 @@ export default function ProtectedRoute({
               </button>
               <button
                 onClick={() => (window.location.href = '/dashboard')}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium transition-all shadow-lg shadow-purple-500/50"
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium transition-all shadow-lg shadow-blue-500/50"
               >
                 Ir al Dashboard
               </button>
@@ -206,7 +206,7 @@ export default function ProtectedRoute({
   // ============================================================================
   if (userData && !userData.isActive) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-purple-900/20 via-slate-900 to-slate-950">
+      <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-blue-900/20 via-slate-900 to-slate-950">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -235,7 +235,7 @@ export default function ProtectedRoute({
                 auth.signOut();
               });
             }}
-            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium transition-all shadow-lg shadow-purple-500/50"
+            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium transition-all shadow-lg shadow-blue-500/50"
           >
             Cerrar Sesión
           </button>

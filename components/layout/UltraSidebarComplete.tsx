@@ -320,7 +320,7 @@ export default function UltraSidebarComplete({
             ${isChild ? 'ml-4 text-sm' : ''}
             ${
               active
-                ? 'bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-purple-600 dark:text-purple-400 shadow-lg shadow-purple-500/20'
+                ? 'bg-gradient-to-r from-blue-500/20 to-blue-500/20 text-blue-600 dark:text-cyan-400 shadow-lg shadow-blue-500/20'
                 : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800/50'
             }
           `}
@@ -329,7 +329,7 @@ export default function UltraSidebarComplete({
           <item.icon
             className={`
               h-5 w-5 flex-shrink-0 transition-transform duration-200
-              ${active ? 'text-purple-600 dark:text-purple-400' : ''}
+              ${active ? 'text-blue-600 dark:text-cyan-400' : ''}
               ${hoveredItem === item.id ? 'scale-110' : ''}
             `}
           />
@@ -382,7 +382,7 @@ export default function UltraSidebarComplete({
           {active && (
             <motion.div
               layoutId="active-indicator"
-              className="absolute left-0 top-0 h-full w-1 rounded-r-full bg-gradient-to-b from-purple-500 to-blue-500"
+              className="absolute left-0 top-0 h-full w-1 rounded-r-full bg-gradient-to-b from-blue-500 to-blue-500"
               initial={false}
               transition={{ type: 'spring', stiffness: 500, damping: 30 }}
             />
@@ -419,10 +419,10 @@ export default function UltraSidebarComplete({
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center gap-2"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 text-white font-bold text-sm">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-500 text-white font-bold text-sm">
               CH
             </div>
-            <span className="text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-600 bg-clip-text text-transparent">
               Chronos
             </span>
           </motion.div>

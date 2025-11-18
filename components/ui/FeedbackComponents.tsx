@@ -297,7 +297,7 @@ export function EmptyState({
       {action && (
         <button
           onClick={action.onClick}
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-2.5 font-medium text-white shadow-lg shadow-purple-500/50 hover:shadow-xl hover:shadow-purple-500/60 transition-all"
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 px-6 py-2.5 font-medium text-white shadow-lg shadow-blue-500/50 hover:shadow-xl hover:shadow-blue-500/60 transition-all"
         >
           {action.icon}
           {action.label}
@@ -421,9 +421,9 @@ export function LoadingState({
     <div className={cn('flex flex-col items-center justify-center gap-4', className)}>
       {/* Spinner */}
       <div className="relative">
-        <div className={cn('rounded-full border-4 border-purple-500/20', sizeClasses[size])} />
+        <div className={cn('rounded-full border-4 border-blue-500/20', sizeClasses[size])} />
         <motion.div
-          className={cn('absolute inset-0 rounded-full border-4 border-purple-500 border-t-transparent', sizeClasses[size])}
+          className={cn('absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent', sizeClasses[size])}
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
         />
@@ -438,7 +438,7 @@ export function LoadingState({
 
   if (fullscreen) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-purple-900/20 via-slate-900 to-slate-950">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-blue-900/20 via-slate-900 to-slate-950">
         {content}
       </div>
     );
@@ -515,7 +515,7 @@ interface ProgressBarProps {
   label?: string;
   showPercentage?: boolean;
   size?: 'sm' | 'md' | 'lg';
-  color?: 'purple' | 'blue' | 'green' | 'yellow' | 'red';
+  color?: 'cyan' | 'blue' | 'green' | 'yellow' | 'red';
   className?: string;
 }
 
@@ -525,7 +525,7 @@ export function ProgressBar({
   label,
   showPercentage = true,
   size = 'md',
-  color = 'purple',
+  color = 'blue',
   className,
 }: ProgressBarProps) {
   const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
@@ -537,11 +537,11 @@ export function ProgressBar({
   };
 
   const colorClasses = {
-    purple: 'from-purple-500 via-pink-500 to-purple-500',
+    cyan: 'from-cyan-500 via-blue-500 to-cyan-500',
     blue: 'from-blue-500 to-cyan-500',
     green: 'from-green-500 to-emerald-500',
     yellow: 'from-yellow-500 to-orange-500',
-    red: 'from-red-500 to-pink-500',
+    red: 'from-red-500 to-cyan-500',
   };
 
   return (
@@ -590,7 +590,7 @@ export function Badge({
 }: BadgeProps) {
   const variantClasses = {
     default: 'bg-white/10 text-gray-300',
-    primary: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+    primary: 'bg-blue-500/20 text-cyan-300 border-blue-500/30',
     success: 'bg-green-500/20 text-green-300 border-green-500/30',
     warning: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
     error: 'bg-red-500/20 text-red-300 border-red-500/30',

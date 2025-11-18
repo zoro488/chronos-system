@@ -93,13 +93,13 @@ function App() {
               <Route
                 path="*"
                 element={
-                  <div className="flex h-screen items-center justify-center bg-gradient-to-br from-purple-900/20 via-slate-900 to-slate-950">
+                  <div className="flex h-screen items-center justify-center bg-gradient-to-br from-blue-900/20 via-slate-900 to-slate-950">
                     <div className="text-center">
                       <h1 className="text-6xl font-bold text-white mb-4">404</h1>
                       <p className="text-gray-400 mb-8">Página no encontrada</p>
                       <a
                         href="/dashboard"
-                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium hover:shadow-lg transition-all"
+                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium hover:shadow-lg transition-all"
                       >
                         Volver al Dashboard
                       </a>

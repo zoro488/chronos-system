@@ -9,7 +9,7 @@ export default function UtilidadesPage() {
       bancoId="utilidades"
       bancoName="Utilidades"
       bancoIcon="💵"
-      bancoColor="from-purple-500 to-purple-600"
+      bancoColor="from-blue-500 to-blue-600"
     />
   );
 }

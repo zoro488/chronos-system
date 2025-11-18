@@ -229,12 +229,12 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
             >
               <motion.div
                 whileHover={{ scale: 1.05, rotate: 5 }}
-                className="p-4 bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 rounded-2xl shadow-2xl"
+                className="p-4 bg-gradient-to-br from-blue-500 via-cyan-500 to-cyan-500 rounded-2xl shadow-2xl"
               >
                 <ShoppingCart className="w-7 h-7 text-white" />
               </motion.div>
               <div>
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
                   Nueva Orden de Compra
                 </h2>
                 <p className="text-slate-400 text-sm flex items-center gap-2 mt-1">
@@ -273,7 +273,7 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
                   <div
                     className={`flex items-center justify-center w-10 h-10 rounded-xl font-bold transition-all ${
                       currentStep >= step.num
-                        ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-lg'
+                        ? 'bg-gradient-to-br from-blue-500 to-cyan-500 text-white shadow-lg'
                         : 'bg-white/5 text-slate-500'
                     }`}
                   >
@@ -291,7 +291,7 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
                   <div
                     className={`h-1 flex-1 mx-2 rounded transition-all ${
                       currentStep > step.num
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500'
+                        ? 'bg-gradient-to-r from-blue-500 to-cyan-500'
                         : 'bg-white/10'
                     }`}
                   />
@@ -328,7 +328,7 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
                     <input
                       {...register('distribuidorNombre')}
                       onChange={(e) => setSearchDistribuidor(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 bg-white/5 border-2 border-white/10 rounded-2xl text-white text-lg placeholder-slate-500 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all"
+                      className="w-full pl-12 pr-4 py-4 bg-white/5 border-2 border-white/10 rounded-2xl text-white text-lg placeholder-slate-500 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all"
                       placeholder="Nombre del distribuidor..."
                       autoFocus
                     />
@@ -350,7 +350,7 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="bg-white/5 border border-purple-500/30 rounded-xl p-3 max-h-48 overflow-y-auto"
+                    className="bg-white/5 border border-blue-500/30 rounded-xl p-3 max-h-48 overflow-y-auto"
                   >
                     <p className="text-xs text-slate-400 mb-2 flex items-center gap-1">
                       <Sparkles className="w-3 h-3" />
@@ -365,10 +365,10 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
                           setValue('distribuidorNombre', dist.nombre);
                           setSearchDistribuidor('');
                         }}
-                        className="w-full text-left px-3 py-2 hover:bg-purple-500/20 rounded-lg text-white text-sm transition-all flex items-center justify-between group"
+                        className="w-full text-left px-3 py-2 hover:bg-blue-500/20 rounded-lg text-white text-sm transition-all flex items-center justify-between group"
                       >
                         <span>{dist.nombre}</span>
-                        <span className="text-xs text-slate-500 group-hover:text-purple-400">
+                        <span className="text-xs text-slate-500 group-hover:text-blue-400">
                           Seleccionar
                         </span>
                       </motion.button>
@@ -397,7 +397,7 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
                   type="button"
                   onClick={() => canProceedToStep2 && setCurrentStep(2)}
                   disabled={!canProceedToStep2}
-                  className="w-full py-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-2xl font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-purple-500/30"
+                  className="w-full py-4 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-2xl font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30"
                 >
                   Continuar a Productos
                   <Zap className="w-5 h-5" />
@@ -448,7 +448,7 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
                         unidad: 'pza',
                       })
                     }
-                    className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl text-sm font-medium flex items-center gap-2"
+                    className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium flex items-center gap-2"
                   >
                     <Plus className="w-4 h-4" />
                     Agregar
@@ -505,11 +505,11 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.9 }}
                       layout
-                      className="p-5 bg-gradient-to-br from-white/10 to-white/5 border border-white/10 rounded-2xl hover:border-purple-500/30 transition-all"
+                      className="p-5 bg-gradient-to-br from-white/10 to-white/5 border border-white/10 rounded-2xl hover:border-blue-500/30 transition-all"
                     >
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
                             {index + 1}
                           </div>
                           <p className="text-sm font-medium text-slate-300">Producto</p>
@@ -532,7 +532,7 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
                           <label className="block text-xs text-slate-400 mb-1">Nombre *</label>
                           <input
                             {...register(`productos.${index}.nombre`)}
-                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-500 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-500 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                             placeholder="Nombre del producto"
                           />
                           {errors.productos?.[index]?.nombre && (
@@ -549,7 +549,7 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
                             {...register(`productos.${index}.cantidad`, { valueAsNumber: true })}
                             type="number"
                             min="1"
-                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                             placeholder="Cant"
                           />
                         </div>
@@ -558,7 +558,7 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
                           <label className="block text-xs text-slate-400 mb-1">Unidad</label>
                           <select
                             {...register(`productos.${index}.unidad`)}
-                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                           >
                             <option value="pza">Pza</option>
                             <option value="kg">Kg</option>
@@ -581,14 +581,14 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
                               type="number"
                               step="0.01"
                               min="0"
-                              className="w-full pl-8 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                              className="w-full pl-8 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                               placeholder="0.00"
                             />
                           </div>
                         </div>
 
                         <div className="md:col-span-12">
-                          <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg">
+                          <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-lg">
                             <span className="text-xs text-slate-400">Subtotal:</span>
                             <span className="text-lg font-bold text-white">
                               $
@@ -629,7 +629,7 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
                   type="button"
                   onClick={() => canProceedToStep3 && setCurrentStep(3)}
                   disabled={!canProceedToStep3}
-                  className="flex-1 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-purple-500/30"
+                  className="flex-1 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-xl font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30"
                 >
                   Continuar a Resumen
                   <Zap className="w-5 h-5" />
@@ -702,7 +702,7 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
                 </div>
 
                 {/* Resumen Financiero */}
-                <div className="p-6 bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-2 border-purple-500/30 rounded-2xl">
+                <div className="p-6 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border-2 border-blue-500/30 rounded-2xl">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-slate-300">
                       <span>Subtotal:</span>
@@ -718,7 +718,7 @@ export default function FormularioOrdenCompra({ onSuccess, onCancel }) {
                       <motion.span
                         animate={{ scale: [1, 1.05, 1] }}
                         transition={{ duration: 2, repeat: Infinity }}
-                        className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
+                        className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
                       >
                         ${total.toFixed(2)}
                       </motion.span>

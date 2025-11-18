@@ -159,7 +159,7 @@ const CompraCard = ({ compra, onClick, onStatusChange }) => {
     >
       {/* Provider Badge */}
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-sm font-bold text-white">
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-sm font-bold text-white">
           {proveedorInitial}
         </div>
         <div className="flex-1 min-w-0">
@@ -420,7 +420,7 @@ const ComprasPage = () => {
               value={stats.totalMonto}
               format="currency"
               trend={8.4}
-              color="purple"
+              color="blue"
               icon={DollarSign}
               delay={3}
             />
@@ -540,7 +540,7 @@ const ComprasPage = () => {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4 flex-1">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-lg font-bold text-white">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-lg font-bold text-white">
                       {compra.proveedorNombre?.charAt(0)}
                     </div>
                     <div>
@@ -646,7 +646,7 @@ const ComprasPage = () => {
               type="submit"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg text-white font-semibold shadow-lg"
+              className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg text-white font-semibold shadow-lg"
             >
               {editingCompra ? 'Actualizar' : 'Crear Compra'}
             </motion.button>

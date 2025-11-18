@@ -9,7 +9,7 @@ export default function LeftiePage() {
       bancoId="leftie"
       bancoName="Leftie"
       bancoIcon="🎯"
-      bancoColor="from-pink-500 to-pink-600"
+      bancoColor="from-cyan-500 to-cyan-600"
     />
   );
 }

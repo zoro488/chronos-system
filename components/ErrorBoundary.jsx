@@ -90,7 +90,7 @@ class ErrorBoundary extends Component {
             {/* Card con glassmorphism */}
             <div className="relative overflow-hidden rounded-2xl border border-neon-red/30 bg-chronos-dark/80 backdrop-blur-xl shadow-2xl shadow-neon-red/20 p-8">
               {/* Gradiente de fondo */}
-              <div className="absolute inset-0 bg-gradient-to-br from-neon-red/5 via-transparent to-neon-purple/5 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-br from-neon-red/5 via-transparent to-neon-blue/5 pointer-events-none" />
 
               {/* Contenido */}
               <div className="relative z-10">

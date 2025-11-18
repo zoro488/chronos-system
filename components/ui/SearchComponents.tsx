@@ -83,7 +83,7 @@ export function SearchBar({
       <div
         className={cn(
           'relative flex items-center rounded-xl border bg-white/5 backdrop-blur-xl transition-all',
-          isFocused ? 'border-purple-500/50 shadow-lg shadow-purple-500/20' : 'border-white/10'
+          isFocused ? 'border-blue-500/50 shadow-lg shadow-blue-500/20' : 'border-white/10'
         )}
       >
         {/* Search Icon */}
@@ -111,7 +111,7 @@ export function SearchBar({
         {/* Loading / Clear Button */}
         {loading ? (
           <div className="pr-4">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-purple-500 border-t-transparent" />
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
           </div>
         ) : value ? (
           <button
@@ -218,10 +218,10 @@ export function FilterPanel({
       {/* Header */}
       <div className="flex items-center justify-between border-b border-white/10 p-4">
         <div className="flex items-center gap-2">
-          <Filter className="h-5 w-5 text-purple-400" />
+          <Filter className="h-5 w-5 text-blue-400" />
           <h3 className="font-semibold text-white">Filtros</h3>
           {getTotalSelected() > 0 && (
-            <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-xs font-medium text-purple-300">
+            <span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-xs font-medium text-cyan-300">
               {getTotalSelected()}
             </span>
           )}
@@ -252,7 +252,7 @@ export function FilterPanel({
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-white">{group.label}</span>
                   {selectedCount > 0 && (
-                    <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-xs font-medium text-purple-300">
+                    <span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-xs font-medium text-cyan-300">
                       {selectedCount}
                     </span>
                   )}
@@ -287,8 +287,8 @@ export function FilterPanel({
                               className={cn(
                                 'flex h-5 w-5 items-center justify-center rounded border transition-colors',
                                 isSelected
-                                  ? 'bg-purple-500 border-purple-500'
-                                  : 'border-white/20 group-hover:border-purple-500/50'
+                                  ? 'bg-blue-500 border-blue-500'
+                                  : 'border-white/20 group-hover:border-blue-500/50'
                               )}
                             >
                               {isSelected && <Check className="h-3 w-3 text-white" />}
@@ -400,7 +400,7 @@ export function SortOptions({
                 className={cn(
                   'w-full px-4 py-3 text-left transition-colors',
                   option.value === value
-                    ? 'bg-purple-500/20 text-purple-300'
+                    ? 'bg-blue-500/20 text-cyan-300'
                     : 'text-gray-300 hover:bg-white/10'
                 )}
               >
@@ -454,10 +454,10 @@ export function TagFilter({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Tag className="h-4 w-4 text-purple-400" />
+          <Tag className="h-4 w-4 text-blue-400" />
           <span className="text-sm font-medium text-white">Etiquetas</span>
           {selectedTags.length > 0 && (
-            <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-xs font-medium text-purple-300">
+            <span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-xs font-medium text-cyan-300">
               {selectedTags.length}
             </span>
           )}
@@ -484,8 +484,8 @@ export function TagFilter({
               className={cn(
                 'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-all',
                 isSelected
-                  ? 'bg-purple-500/20 border-purple-500/50 text-purple-300'
-                  : 'bg-white/5 border-white/10 text-gray-300 hover:border-purple-500/30'
+                  ? 'bg-blue-500/20 border-blue-500/50 text-cyan-300'
+                  : 'bg-white/5 border-white/10 text-gray-300 hover:border-blue-500/30'
               )}
             >
               <Tag className="h-3 w-3" />

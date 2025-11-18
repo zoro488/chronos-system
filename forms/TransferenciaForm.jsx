@@ -174,7 +174,7 @@ export const TransferenciaForm = ({ onSuccess, onCancel, className = '' }) => {
       />
 
       {watchMonto > 0 && watchBancoOrigen && watchBancoDestino && (
-        <div className="p-4 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/50">
+        <div className="p-4 rounded-xl bg-gradient-to-r from-blue-500/10 to-blue-500/10 border border-blue-500/50">
           <div className="flex justify-between items-center mb-2">
             <span className="text-red-400">-${watchMonto.toLocaleString('es-MX')}</span>
             <span className="text-white/50">→</span>
