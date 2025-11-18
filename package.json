@@ -8,11 +8,20 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
     "test": "vitest",
     "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:report": "playwright show-report",
     "type-check": "tsc --noEmit",
-    "test:run": "vitest run"
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "firebase:deploy": "firebase deploy",
+    "firebase:deploy:hosting": "firebase deploy --only hosting",
+    "firebase:deploy:rules": "firebase deploy --only firestore:rules"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.0.0",

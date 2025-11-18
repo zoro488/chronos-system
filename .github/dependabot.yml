@@ -9,9 +9,9 @@ updates:
       time: "09:00"
     open-pull-requests-limit: 10
     reviewers:
-      - "yourusername"
+      - "zoro488"
     assignees:
-      - "yourusername"
+      - "zoro488"
     commit-message:
       prefix: "chore"
       prefix-development: "chore"
@@ -19,17 +19,67 @@ updates:
     labels:
       - "dependencies"
       - "automated"
-    # Agrupar actualizaciones de desarrollo
+    # Agrupar actualizaciones por categorías
     groups:
-      development-dependencies:
-        dependency-type: "development"
+      # Firebase dependencies
+      firebase:
         patterns:
-          - "*"
-      production-dependencies:
-        dependency-type: "production"
+          - "firebase*"
         update-types:
           - "minor"
           - "patch"
+      
+      # React ecosystem
+      react:
+        patterns:
+          - "react*"
+          - "@types/react*"
+        update-types:
+          - "minor"
+          - "patch"
+      
+      # Testing dependencies
+      testing:
+        patterns:
+          - "@playwright/test"
+          - "@testing-library/*"
+          - "vitest*"
+          - "@vitest/*"
+          - "jsdom"
+        update-types:
+          - "minor"
+          - "patch"
+      
+      # Development tools
+      dev-tools:
+        patterns:
+          - "eslint*"
+          - "prettier"
+          - "typescript"
+          - "@typescript-eslint/*"
+          - "vite*"
+          - "@vitejs/*"
+        update-types:
+          - "minor"
+          - "patch"
+      
+      # General development dependencies
+      development-dependencies:
+        dependency-type: "development"
+        exclude-patterns:
+          - "firebase*"
+          - "react*"
+          - "@playwright/test"
+          - "@testing-library/*"
+          - "vitest*"
+          - "eslint*"
+          - "prettier"
+          - "typescript"
+          - "vite*"
+        update-types:
+          - "minor"
+          - "patch"
+    
     # Ignorar actualizaciones de versiones mayores para estas dependencias críticas
     ignore:
       - dependency-name: "react"
@@ -37,6 +87,8 @@ updates:
       - dependency-name: "react-dom"
         update-types: ["version-update:semver-major"]
       - dependency-name: "vite"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "firebase"
         update-types: ["version-update:semver-major"]
 
   # Mantener GitHub Actions actualizadas
@@ -50,3 +102,7 @@ updates:
     labels:
       - "ci/cd"
       - "automated"
+    groups:
+      github-actions:
+        patterns:
+          - "*"

@@ -1,5 +1,13 @@
 # 🌌 CHRONOS SYSTEM - Sistema Completo Premium
 
+[![CI/CD Pipeline](https://github.com/zoro488/chronos-system/actions/workflows/ci-cd-complete.yml/badge.svg)](https://github.com/zoro488/chronos-system/actions/workflows/ci-cd-complete.yml)
+[![codecov](https://codecov.io/gh/zoro488/chronos-system/branch/main/graph/badge.svg)](https://codecov.io/gh/zoro488/chronos-system)
+[![Playwright Tests](https://img.shields.io/badge/playwright-tests-passing-brightgreen)](https://github.com/zoro488/chronos-system/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.2-blue)](https://reactjs.org/)
+[![Firebase](https://img.shields.io/badge/Firebase-10.0-orange)](https://firebase.google.com/)
+
 **Carpeta Nueva**: `src/chronos-system/`
 **Objetivo**: Implementación completa de 37 prompts sin conflictos
 **Estado**: 🔄 EN DESARROLLO (5/37 completados - 14%)
@@ -276,6 +284,162 @@ Al completar los 37 prompts tendremos:
 4. ✅ **Dashboard completo** con KPIs y gráficos
 5. ✅ **Sistema de branding CHRONOS** con logos y splash screen
 6. ✅ **Arquitectura escalable** lista para producción
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ ([Download](https://nodejs.org/))
+- npm 9+
+- Git
+
+### Installation
+
+```bash
+# Clone el repositorio
+git clone https://github.com/zoro488/chronos-system.git
+cd chronos-system
+
+# Instalar dependencias
+npm install
+
+# Instalar navegadores de Playwright
+npx playwright install
+
+# Copiar variables de entorno
+cp .env.example .env.local
+
+# Editar .env.local con tus credenciales de Firebase
+```
+
+### Development
+
+```bash
+# Iniciar servidor de desarrollo
+npm run dev
+
+# En otra terminal, ejecutar tests
+npm run test
+
+# Ejecutar linter
+npm run lint
+```
+
+---
+
+## 🧪 Testing
+
+### Unit Tests
+
+```bash
+npm run test              # Watch mode
+npm run test:run          # Run once
+npm run test:coverage     # With coverage
+npm run test:ui           # Interactive UI
+```
+
+### E2E Tests
+
+```bash
+npm run test:e2e          # All browsers
+npm run test:e2e:ui       # Interactive UI
+npm run test:e2e:headed   # See browser
+npm run test:e2e:report   # View report
+```
+
+---
+
+## 📦 Deployment
+
+### Firebase Hosting
+
+```bash
+# Build para producción
+npm run build
+
+# Deploy a Firebase
+npm run firebase:deploy:hosting
+
+# O deploy completo (rules + hosting)
+npm run firebase:deploy
+```
+
+### Vercel (Alternativa)
+
+El proyecto está configurado para deployar automáticamente en Vercel cuando se hace push a la rama `main`.
+
+---
+
+## 📚 Documentation
+
+Documentación completa disponible en la carpeta `/docs`:
+
+- [🤖 Automation Setup](./docs/AUTOMATION_SETUP.md) - Configuración de automatización completa
+- [🔄 CI/CD Pipeline](./docs/CI_CD_PIPELINE.md) - Documentación del pipeline
+- [🔥 Firebase Setup](./docs/FIREBASE_SETUP.md) - Guía de configuración de Firebase
+- [🧪 Testing Guide](./docs/TESTING_GUIDE.md) - Guía completa de testing
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **React 18.2** - UI Library
+- **TypeScript 5.3** - Type safety
+- **Vite 5.0** - Build tool
+- **TailwindCSS** - Styling
+- **Framer Motion** - Animations
+
+### Backend
+- **Firebase 10.0** - Backend as a Service
+  - Authentication
+  - Firestore
+  - Hosting
+  - Storage
+
+### State Management
+- **Zustand** - Global state
+- **TanStack Query** - Server state
+
+### Testing
+- **Vitest** - Unit tests
+- **Playwright** - E2E tests
+- **Testing Library** - React testing
+
+### CI/CD
+- **GitHub Actions** - Automation
+- **Codecov** - Coverage reports
+- **Firebase Hosting** - Deployment
+
+---
+
+## 🤝 Contributing
+
+Las contribuciones son bienvenidas. Por favor:
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+---
+
+## 📝 License
+
+Este proyecto está bajo la licencia MIT. Ver el archivo [LICENSE](LICENSE) para más detalles.
+
+---
+
+## 🆘 Support
+
+Si encuentras problemas o tienes preguntas:
+
+- 📖 Revisa la [documentación](./docs/)
+- 🐛 Abre un [issue](https://github.com/zoro488/chronos-system/issues)
+- 💬 Únete a las [discusiones](https://github.com/zoro488/chronos-system/discussions)
 
 ---
 
