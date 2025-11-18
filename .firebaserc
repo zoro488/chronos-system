@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "chronos-system-prod",
+    "staging": "chronos-system-staging",
+    "development": "chronos-system-dev"
+  }
+}
