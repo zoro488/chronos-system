@@ -1,75 +1,52 @@
 version: 2
 updates:
-  # ============================================================================
-  # NPM DEPENDENCIES
-  # ============================================================================
+  # Mantener las dependencias de npm actualizadas
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"
-      time: "04:00"
-      timezone: "America/Mexico_City"
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
     open-pull-requests-limit: 10
+    reviewers:
+      - "yourusername"
     assignees:
-      - "zoro488"
+      - "yourusername"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
     labels:
       - "dependencies"
-      - "automerge"
-    commit-message:
-      prefix: "⬆️"
-      include: "scope"
+      - "automated"
+    # Agrupar actualizaciones de desarrollo
+    groups:
+      development-dependencies:
+        dependency-type: "development"
+        patterns:
+          - "*"
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+    # Ignorar actualizaciones de versiones mayores para estas dependencias críticas
     ignore:
-      # Ignore major version updates for these packages
       - dependency-name: "react"
         update-types: ["version-update:semver-major"]
       - dependency-name: "react-dom"
         update-types: ["version-update:semver-major"]
-    groups:
-      # Group all Firebase packages together
-      firebase:
-        patterns:
-          - "firebase*"
-      # Group all React Query packages
-      react-query:
-        patterns:
-          - "@tanstack/react-query*"
-      # Group all testing packages
-      testing:
-        patterns:
-          - "*vitest*"
-          - "*playwright*"
-          - "@testing-library/*"
-      # Group all linting/formatting packages
-      dev-tools:
-        patterns:
-          - "eslint*"
-          - "prettier*"
-          - "@typescript-eslint/*"
+      - dependency-name: "vite"
+        update-types: ["version-update:semver-major"]
 
-  # ============================================================================
-  # GITHUB ACTIONS
-  # ============================================================================
+  # Mantener GitHub Actions actualizadas
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "04:00"
-    labels:
-      - "ci"
-      - "dependencies"
     commit-message:
-      prefix: "⬆️ CI"
-      include: "scope"
-
-  # ============================================================================
-  # DOCKER (si se usa)
-  # ============================================================================
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
+      prefix: "ci"
     labels:
-      - "docker"
-      - "dependencies"
+      - "ci/cd"
+      - "automated"

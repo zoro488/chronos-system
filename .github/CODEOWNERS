@@ -1,0 +1,47 @@
+# 👥 Code Owners - Premium Ecosystem
+# These owners will be requested for review when someone opens a pull request.
+
+# Default owner for everything
+* @zoro488
+
+# GitHub Actions & CI/CD
+/.github/ @zoro488
+/.github/workflows/ @zoro488
+/.github/scripts/ @zoro488
+
+# Configuración de build y deployment
+/vite.config.js @yourusername
+/package.json @yourusername
+/package-lock.json @yourusername
+/firebase.json @yourusername
+/vercel.json @yourusername
+
+# FlowDistributor App
+/src/apps/FlowDistributor/ @yourusername
+
+# ShadowPrime App
+/src/apps/ShadowPrime/ @yourusername
+
+# Apollo App
+/src/apps/Apollo/ @yourusername
+
+# Synapse App
+/src/apps/Synapse/ @yourusername
+
+# Nexus App
+/src/apps/Nexus/ @yourusername
+
+# Componentes compartidos
+/src/components/shared/ @yourusername
+
+# Configuración de APIs y servicios
+/src/config/ @yourusername
+/src/services/ @yourusername
+
+# Tests
+/src/test/ @yourusername
+/playwright.config.js @yourusername
+
+# Documentación
+*.md @yourusername
+/docs/ @yourusername

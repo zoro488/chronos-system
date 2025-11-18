@@ -1,0 +1,108 @@
+# Dependency Review Configuration
+# Documentación: https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/dependency-review-action
+
+# Nivel de severidad que causa el fallo del check
+fail-on-severity: moderate
+
+# Licencias permitidas (whitelist)
+allow-licenses:
+  - MIT
+  - Apache-2.0
+  - BSD-2-Clause
+  - BSD-3-Clause
+  - ISC
+  - CC0-1.0
+  - Unlicense
+  - 0BSD
+
+# Licencias denegadas (blacklist)
+deny-licenses:
+  - GPL-2.0
+  - GPL-3.0
+  - AGPL-1.0
+  - AGPL-3.0
+  - LGPL-2.0
+  - LGPL-2.1
+  - LGPL-3.0
+  - SSPL-1.0
+  - CC-BY-NC-1.0
+  - CC-BY-NC-2.0
+  - CC-BY-NC-3.0
+  - CC-BY-NC-4.0
+
+# Grupos de licencias
+allow-dependencies-licenses:
+  - MIT
+  - Apache-2.0
+
+# Vulnerabilidades conocidas a ignorar (usar con precaución)
+# allow-ghsas:
+#   - GHSA-xxxx-xxxx-xxxx
+
+# Paquetes específicos a denegar
+deny-packages:
+  # Paquetes conocidos por tener problemas de seguridad
+  - pkg:npm/event-stream@3.3.6
+  - pkg:npm/flatmap-stream@*
+
+# Paquetes específicos a permitir (override)
+# allow-packages:
+#   - pkg:npm/some-package@1.0.0
+
+# Configuración de scopes
+# Revisar solo dependencias de producción (excluir devDependencies)
+check-only-production-dependencies: false
+
+# Comentar resumen en PR
+comment-summary-in-pr: always
+
+# Configuración de checks
+vulnerability-check: true
+license-check: true
+
+# Fallar en cambios que introducen nuevas dependencias con licencias no permitidas
+fail-on-scopes:
+  - runtime
+  - development
+
+# Configuración de GitHub Advanced Security
+# Integración con Dependabot alerts
+use-dependabot-alerts: true
+
+# Configuración de scoring
+# Puntaje CVSS mínimo para considerar una vulnerabilidad
+cvss-threshold: 4.0
+
+# Configuración de notificaciones
+notify-on-failure: true
+
+# Configuración de excepciones
+exemptions:
+  # Temporalmente permitir ciertas vulnerabilidades (documentar el motivo)
+  # advisory-ids:
+  #   - GHSA-xxxx-xxxx-xxxx
+
+# Configuración de ecosistemas soportados
+ecosystems:
+  - npm
+  - github-actions
+
+# Configuración de severidades personalizadas
+severity-levels:
+  critical: error
+  high: error
+  moderate: warning
+  low: warning
+
+# Configuración de acciones automáticas
+auto-create-issues: false
+auto-assign-issues: []
+
+# Labels a añadir a issues/PRs
+labels:
+  - security
+  - dependencies
+
+# Configuración de actualizaciones
+suggest-updates: true
+update-strategy: semver-patch

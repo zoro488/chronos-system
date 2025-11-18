@@ -1,0 +1,154 @@
+# ============================================================================
+# Release Drafter Configuration
+# Automatically drafts release notes based on merged PRs
+# ============================================================================
+
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+
+categories:
+  - title: "🚀 Features"
+    labels:
+      - "✨ enhancement"
+      - "💡 feature"
+      - "feature"
+      - "enhancement"
+
+  - title: "🐛 Bug Fixes"
+    labels:
+      - "🐛 bug"
+      - "bug"
+      - "fix"
+
+  - title: "🔒 Security"
+    labels:
+      - "🔒 security"
+      - "security"
+
+  - title: "🚀 Performance"
+    labels:
+      - "🚀 performance"
+      - "performance"
+      - "optimization"
+
+  - title: "📝 Documentation"
+    labels:
+      - "📝 documentation"
+      - "documentation"
+      - "docs"
+
+  - title: "🧪 Testing"
+    labels:
+      - "🧪 testing"
+      - "testing"
+      - "tests"
+
+  - title: "🔧 Maintenance"
+    labels:
+      - "🔧 maintenance"
+      - "maintenance"
+      - "chore"
+      - "dependencies"
+
+  - title: "🎨 UI/UX"
+    labels:
+      - "🎨 ui-ux"
+      - "ui"
+      - "ux"
+      - "design"
+
+  - title: "🔌 API Changes"
+    labels:
+      - "🔌 api"
+      - "api"
+      - "backend"
+
+change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
+
+change-title-escapes: '\<*_&' # You can add # and @ to disable mentions
+
+version-resolver:
+  major:
+    labels:
+      - "major"
+      - "breaking-change"
+  minor:
+    labels:
+      - "minor"
+      - "✨ enhancement"
+      - "💡 feature"
+  patch:
+    labels:
+      - "patch"
+      - "🐛 bug"
+      - "🔒 security"
+  default: patch
+
+template: |
+  ## 🎯 What's Changed
+
+  $CHANGES
+
+  ## 📊 Statistics
+
+  - **Contributors**: @$CONTRIBUTORS
+  - **PRs merged**: $NUMBER_OF_CHANGES
+
+  ## 🔗 Full Changelog
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+
+  ---
+
+  ## 📥 Installation
+
+  ```bash
+  npm install @zoro488/chronos-system@$RESOLVED_VERSION
+  ```
+
+  ## 🚀 Quick Start
+
+  ```bash
+  git clone https://github.com/zoro488/chronos-system.git
+  cd chronos-system
+  npm install
+  npm run dev
+  ```
+
+exclude-labels:
+  - "skip-changelog"
+  - "duplicate"
+  - "invalid"
+  - "wontfix"
+  - "❌ wontfix"
+  - "🔄 duplicate"
+
+autolabeler:
+  - label: "📝 documentation"
+    files:
+      - "*.md"
+      - "docs/**/*"
+
+  - label: "🧪 testing"
+    files:
+      - "**/*.test.js"
+      - "**/*.test.ts"
+      - "**/*.spec.js"
+      - "**/*.spec.ts"
+      - "tests/**/*"
+
+  - label: "🎨 ui-ux"
+    files:
+      - "**/*.css"
+      - "**/*.scss"
+      - "**/components/**/*"
+
+  - label: "🔌 api"
+    files:
+      - "**/services/**/*"
+      - "**/api/**/*"
+
+  - label: "dependencies"
+    files:
+      - "package.json"
+      - "package-lock.json"

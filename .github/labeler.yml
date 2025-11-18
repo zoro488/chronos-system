@@ -1,0 +1,77 @@
+# ============================================================================
+# Auto Labeler Configuration
+# Automatically label PRs based on files changed
+# ============================================================================
+
+# Frontend
+"🎨 ui-ux":
+  - changed-files:
+      - any-glob-to-any-file:
+          [
+            "src/components/**/*",
+            "src/apps/**/*.jsx",
+            "src/apps/**/*.tsx",
+            "**/*.css",
+            "**/*.scss",
+          ]
+
+# Backend/API
+"🔌 api":
+  - changed-files:
+      - any-glob-to-any-file:
+          ["src/services/**/*", "src/api/**/*", "src/lib/firebase*"]
+
+# Documentation
+"📝 documentation":
+  - changed-files:
+      - any-glob-to-any-file: ["**/*.md", "docs/**/*", "README*"]
+
+# Testing
+"🧪 testing":
+  - changed-files:
+      - any-glob-to-any-file:
+          ["**/*.test.*", "**/*.spec.*", "tests/**/*", "__tests__/**/*"]
+
+# Configuration
+"🔧 maintenance":
+  - changed-files:
+      - any-glob-to-any-file:
+          [
+            "**/*.config.*",
+            "package.json",
+            "tsconfig.json",
+            ".github/**/*",
+            ".vscode/**/*",
+          ]
+
+# Dependencies
+"dependencies":
+  - changed-files:
+      - any-glob-to-any-file:
+          ["package.json", "package-lock.json", "yarn.lock", "pnpm-lock.yaml"]
+
+# GitHub Actions
+"github-actions":
+  - changed-files:
+      - any-glob-to-any-file: [".github/workflows/**/*"]
+
+# Mobile/Responsive
+"📱 mobile":
+  - changed-files:
+      - any-glob-to-any-file: ["**/*mobile*", "**/*responsive*"]
+
+# Performance
+"🚀 performance":
+  - head-branch: ["^perf", "performance"]
+
+# Security
+"🔒 security":
+  - head-branch: ["^security", "sec-*"]
+
+# Bug Fix
+"🐛 bug":
+  - head-branch: ["^fix", "bugfix", "hotfix"]
+
+# Feature
+"💡 feature":
+  - head-branch: ["^feat", "feature"]
