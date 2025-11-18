@@ -73,7 +73,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: ⚡ Run Lighthouse
         uses: treosh/lighthouse-ci-action@v10
@@ -202,7 +202,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 🎯 Setup Node.js
         uses: actions/setup-node@v4
