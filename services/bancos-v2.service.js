@@ -1,5 +1,5 @@
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, limit, onSnapshot, orderBy, query, runTransaction, Timestamp, updateDoc, where } from 'firebase/firestore';
-import { traceFirestoreOperation, traceTransaction } from '../../../../config/tracing';
+import { traceFirestoreOperation, traceTransaction } from '../config/tracing';
 import { db } from '../config/firebase';
 
 const BANCOS_COLLECTION = 'bancos';
