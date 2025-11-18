@@ -1,0 +1,114 @@
+name: Bug Report
+description: Reportar un error o problema en el sistema
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por reportar un bug. Por favor completa la siguiente información para ayudarnos a resolverlo.
+
+  - type: dropdown
+    id: app
+    attributes:
+      label: Aplicación Afectada
+      description: ¿En qué aplicación del ecosistema ocurre el bug?
+      options:
+        - FlowDistributor
+        - ShadowPrime
+        - Apollo
+        - Synapse
+        - Nexus
+        - Hub Principal
+        - Componentes Compartidos
+        - Otro
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severidad
+      description: ¿Qué tan grave es el problema?
+      options:
+        - Crítico - El sistema no funciona
+        - Alto - Funcionalidad importante afectada
+        - Medio - Problema molesto pero con workaround
+        - Bajo - Problema menor o cosmético
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descripción del Bug
+      description: Descripción clara y concisa del problema
+      placeholder: El sistema falla cuando...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para Reproducir
+      description: ¿Cómo podemos reproducir el error?
+      placeholder: |
+        1. Ir a '...'
+        2. Hacer clic en '...'
+        3. Scroll down a '...'
+        4. Ver error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamiento Esperado
+      description: ¿Qué esperabas que sucediera?
+      placeholder: Debería...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportamiento Actual
+      description: ¿Qué sucede en realidad?
+      placeholder: En su lugar...
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots o Videos
+      description: Si es aplicable, agrega capturas de pantalla o videos
+      placeholder: Arrastra y suelta imágenes aquí
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Entorno
+      description: Información sobre tu entorno de ejecución
+      value: |
+        - OS: [e.g. Windows 11, macOS 13, Ubuntu 22.04]
+        - Browser: [e.g. Chrome 120, Firefox 121, Safari 17]
+        - Node version: [e.g. 18.17.0]
+        - Build: [e.g. Development, Production]
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs de Error
+      description: Si hay mensajes de error en la consola, pégalos aquí
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Información Adicional
+      description: Cualquier otro contexto relevante sobre el problema

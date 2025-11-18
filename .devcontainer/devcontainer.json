@@ -1,0 +1,96 @@
+{
+  "name": "Chronos System Development",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bullseye",
+
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "dockerDashComposeVersion": "v2"
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "github.copilot",
+        "github.copilot-chat",
+        "github.vscode-pull-request-github",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "dsznajder.es7-react-js-snippets",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense",
+        "vitest.explorer",
+        "ms-playwright.playwright",
+        "usernamehw.errorlens",
+        "gruntfuggly.todo-tree",
+        "pkief.material-icon-theme",
+        "github.github-vscode-theme",
+        "toba.vsfire",
+        "eamodio.gitlens",
+        "streetsidesoftware.code-spell-checker"
+      ],
+      "settings": {
+        "github.copilot.enable": {
+          "*": true,
+          "yaml": true,
+          "plaintext": true,
+          "markdown": true
+        },
+        "github.copilot.advanced": {
+          "debug.overrideEngine": "gpt-4"
+        },
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "typescript.tsserver.maxTsServerMemory": 4096,
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      }
+    },
+    "codespaces": {
+      "openFiles": ["README.md", "package.json", "src/main.tsx"]
+    }
+  },
+
+  "forwardPorts": [5173, 3000, 8080, 9000],
+  "portsAttributes": {
+    "5173": {
+      "label": "Vite Dev Server",
+      "onAutoForward": "notify"
+    },
+    "3000": {
+      "label": "Preview Server",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "postCreateCommand": "npm install && npm run build && echo '✅ Chronos System está listo para usar!'",
+  "postStartCommand": "gh auth status",
+
+  "remoteUser": "node",
+  "containerUser": "node",
+
+  "mounts": [
+    "source=${localEnv:HOME}/.gitconfig,target=/home/node/.gitconfig,type=bind,consistency=cached"
+  ],
+
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  }
+}

@@ -1,0 +1,59 @@
+# ============================================================================
+# Auto Assignment Configuration for PRs
+# ============================================================================
+
+# Add reviewers to pull requests
+addReviewers: true
+
+# Add assignees to pull requests
+addAssignees: true
+
+# A list of reviewers to be added to pull requests (GitHub user name)
+reviewers:
+  - zoro488
+
+# A list of assignees, overrides reviewers if set
+assignees:
+  - zoro488
+
+# A number of reviewers added to the pull request
+# Set 0 to add all the reviewers (default: 0)
+numberOfReviewers: 1
+
+# A number of assignees to add to the pull request
+# Set to 0 to add all of the assignees.
+# Uses numberOfReviewers if unset.
+numberOfAssignees: 0
+
+# Skip adding reviewers/assignees if there are already reviewers/assignees
+skipIfAlreadyAssigned: true
+
+# Skip adding reviewers/assignees if the PR is a draft
+skipDraftPullRequests: true
+
+# Assign reviewers based on files changed
+useReviewGroups: true
+
+reviewGroups:
+  frontend:
+    - "**/*.jsx"
+    - "**/*.tsx"
+    - "**/*.css"
+    - "**/*.scss"
+  backend:
+    - "**/services/**"
+    - "**/firebase/**"
+    - "**/api/**"
+  config:
+    - "**/*.config.js"
+    - "**/*.config.ts"
+    - "**/package.json"
+    - "**/.github/**"
+  tests:
+    - "**/*.test.js"
+    - "**/*.test.ts"
+    - "**/*.spec.js"
+    - "**/*.spec.ts"
+  docs:
+    - "**/*.md"
+    - "**/docs/**"

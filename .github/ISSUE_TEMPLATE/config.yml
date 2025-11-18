@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Preguntas y Discusiones
+    url: https://github.com/yourusername/premium-ecosystem/discussions
+    about: Para preguntas generales, usa GitHub Discussions
+  - name: Documentación
+    url: https://github.com/yourusername/premium-ecosystem/blob/main/README.md
+    about: Revisa la documentación completa del proyecto
+  - name: Guía de APIs
+    url: https://github.com/yourusername/premium-ecosystem/blob/main/API_SETUP_GUIDE.md
+    about: Guía completa para configurar las APIs

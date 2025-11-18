@@ -1,0 +1,98 @@
+name: "CodeQL Configuration - Premium Ecosystem"
+
+# Deshabilitar análisis automático de dependencias (usar Dependabot en su lugar)
+disable-default-queries: false
+
+# Queries adicionales
+queries:
+  - name: security-extended
+    uses: security-extended
+  - name: security-and-quality
+    uses: security-and-quality
+
+# Paths a incluir en el análisis
+paths:
+  - src
+  - public
+  - scripts
+
+# Paths a excluir del análisis
+paths-ignore:
+  - '**/node_modules'
+  - '**/dist'
+  - '**/build'
+  - '**/*.test.js'
+  - '**/*.test.jsx'
+  - '**/*.spec.js'
+  - '**/*.spec.jsx'
+  - '**/coverage'
+  - '**/__tests__'
+  - '**/__mocks__'
+  - '**/e2e'
+  - '**/playwright-report'
+  - '**/.vscode'
+  - '**/.github'
+
+# Query filters para reducir falsos positivos
+query-filters:
+  - exclude:
+      id:
+        - js/unused-local-variable
+        - js/debugger-statement
+      tags:
+        - experimental
+  - include:
+      severity:
+        - error
+        - warning
+      tags:
+        - security
+        - external/cwe
+
+# Configuración de build (para lenguajes compilados)
+# Para JavaScript/TypeScript, esto es opcional
+build:
+  mode: autobuild
+
+# Configuración avanzada
+advanced:
+  # Tiempo máximo de ejecución de queries (en segundos)
+  query-timeout: 300
+
+  # Memoria máxima para el análisis
+  ram: 6144
+
+  # Número de threads
+  threads: 2
+
+  # Nivel de debug
+  debug: false
+
+  # Registro detallado
+  verbose: true
+
+# Queries personalizadas
+custom-queries:
+  - name: custom-security
+    description: "Custom security queries for React and Firebase"
+    queries:
+      # Detectar uso inseguro de dangerouslySetInnerHTML
+      - id: react-dangerous-html
+        name: "Unsafe use of dangerouslySetInnerHTML"
+        severity: warning
+
+      # Detectar hardcoded credentials
+      - id: hardcoded-credentials
+        name: "Hardcoded credentials"
+        severity: error
+
+      # Detectar Firebase rules no seguras
+      - id: firebase-insecure-rules
+        name: "Insecure Firebase rules"
+        severity: error
+
+# Configuración de pack queries
+packs:
+  javascript:
+    - codeql/javascript-queries
+    - codeql/javascript-all

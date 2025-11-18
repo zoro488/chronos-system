@@ -1,0 +1,111 @@
+name: Feature Request
+description: Sugerir una nueva funcionalidad o mejora
+title: "[FEATURE] "
+labels: ["enhancement", "needs-review"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias por tu sugerencia! Completa la siguiente información para que podamos evaluar tu propuesta.
+
+  - type: dropdown
+    id: app
+    attributes:
+      label: Aplicación Objetivo
+      description: ¿Para qué aplicación es esta funcionalidad?
+      options:
+        - FlowDistributor
+        - ShadowPrime
+        - Apollo
+        - Synapse
+        - Nexus
+        - Hub Principal
+        - Todas las Aplicaciones
+        - Nueva Aplicación
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioridad
+      description: ¿Qué tan importante es esta funcionalidad?
+      options:
+        - Alta - Necesaria para el negocio
+        - Media - Mejoraría significativamente la UX
+        - Baja - Nice to have
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema a Resolver
+      description: ¿Qué problema resuelve esta funcionalidad?
+      placeholder: Actualmente es difícil/imposible...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solución Propuesta
+      description: Describe cómo te gustaría que funcionara
+      placeholder: Me gustaría poder...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas Consideradas
+      description: ¿Has considerado otras soluciones o workarounds?
+      placeholder: Otra opción sería...
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups o Diseños
+      description: Si tienes diseños o wireframes, compártelos aquí
+      placeholder: Arrastra y suelta imágenes aquí
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impacto Esperado
+      description: ¿Cómo beneficiará esto a los usuarios?
+      placeholder: |
+        - Reducirá el tiempo de X en Y%
+        - Mejorará la experiencia de...
+        - Permitirá hacer...
+
+  - type: dropdown
+    id: breaking
+    attributes:
+      label: ¿Breaking Change?
+      description: ¿Esta funcionalidad requiere cambios que rompan compatibilidad?
+      options:
+        - No - Totalmente compatible
+        - Sí - Requiere migración de datos
+        - Sí - Cambios en API
+        - No estoy seguro
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical
+    attributes:
+      label: Consideraciones Técnicas
+      description: Si tienes conocimiento técnico, sugiere cómo implementarlo
+      placeholder: |
+        - Tecnologías:
+        - APIs necesarias:
+        - Complejidad estimada:
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Información Adicional
+      description: Cualquier otro contexto o información relevante
