@@ -33,6 +33,7 @@ import PropTypes from 'prop-types';
 import { z } from 'zod';
 
 import { Spinner } from '../components/animations/AnimationSystem';
+import { useAuth } from '../components/auth';
 import { Alert, useToast } from '../components/feedback/FeedbackComponents';
 import { Button, IconButton } from '../components/ui/BaseComponents';
 import {
@@ -101,6 +102,7 @@ export const OrdenCompraForm = ({ ordenId = null, onSuccess, onCancel, className
   const [productos, setProductos] = useState([]);
   const toast = useToast();
   const db = getFirestore();
+  const { user, userData } = useAuth();
 
   const {
     register,
@@ -203,7 +205,8 @@ export const OrdenCompraForm = ({ ordenId = null, onSuccess, onCancel, className
         saldoPendiente: total,
         notas: data.notas || null,
         createdAt: Timestamp.now(),
-        createdBy: 'current-user',
+        createdBy: user?.uid || 'system',
+        createdByName: userData?.displayName || 'Sistema',
         updatedAt: Timestamp.now(),
       };
 

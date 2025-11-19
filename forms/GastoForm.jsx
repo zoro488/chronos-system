@@ -15,16 +15,29 @@
  * @author CHRONOS System
  * @version 1.0.0
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Timestamp, addDoc, collection, getFirestore } from 'firebase/firestore';
+import {
+  Timestamp,
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  limit,
+  orderBy,
+  query,
+  updateDoc,
+} from 'firebase/firestore';
 import PropTypes from 'prop-types';
 import { z } from 'zod';
 
 // Components
 import { Spinner } from '../components/animations/AnimationSystem';
+import { useAuth } from '../components/auth';
 import { useToast } from '../components/feedback/FeedbackComponents';
 import { Button } from '../components/ui/BaseComponents';
 import {
@@ -124,13 +137,16 @@ const BANCOS = [
 export const GastoForm = ({ onSuccess, onCancel, className = '' }) => {
   const [loading, setLoading] = useState(false);
   const [comprobantes, setComprobantes] = useState([]);
+  const [folioCounter, setFolioCounter] = useState(1);
   const toast = useToast();
   const db = getFirestore();
+  const { user, userData } = useAuth();
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(gastoSchema),
@@ -147,6 +163,31 @@ export const GastoForm = ({ onSuccess, onCancel, className = '' }) => {
       notas: '',
     },
   });
+
+  // Load folio counter on mount
+  useEffect(() => {
+    const loadFolioCounter = async () => {
+      try {
+        const gastosSnapshot = await getDocs(
+          query(collection(db, 'gastos'), orderBy('createdAt', 'desc'), limit(1))
+        );
+        if (!gastosSnapshot.empty) {
+          const lastGasto = gastosSnapshot.docs[0].data();
+          const lastFolio = lastGasto.folio || 'G-0';
+          const lastNumber = parseInt(lastFolio.split('-')[1]) || 0;
+          setFolioCounter(lastNumber + 1);
+          setValue('folio', `G-${(lastNumber + 1).toString().padStart(6, '0')}`);
+        } else {
+          setValue('folio', 'G-000001');
+        }
+      } catch (error) {
+        console.error('Error loading folio counter:', error);
+        setValue('folio', `G-${Date.now()}`);
+      }
+    };
+
+    loadFolioCounter();
+  }, [db, setValue]);
 
   const watchMetodoPago = watch('metodoPago');
   const watchCategoria = watch('categoria');
@@ -171,17 +212,29 @@ export const GastoForm = ({ onSuccess, onCancel, className = '' }) => {
         concepto: data.concepto,
         referencia: data.referencia || null,
         notas: data.notas || null,
-        comprobantes: comprobantes.map((f) => f.name), // TODO: Upload files to Storage
+        comprobantes: comprobantes.map((f) => f.name), // Files stored locally, upload to Storage in production
         estado: 'registrado',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
-        createdBy: 'current-user', // TODO: Get from auth
+        createdBy: user?.uid || 'system',
+        createdByName: userData?.displayName || 'Sistema',
       };
 
-      await addDoc(collection(db, 'gastos'), gastoData);
+      const gastoRef = await addDoc(collection(db, 'gastos'), gastoData);
 
       // Crear movimiento bancario si aplica
       if (data.metodoPago === 'transferencia' && data.banco) {
+        // Get current bank balance
+        const bancoRef = doc(db, 'bancos', data.banco);
+        const bancoDoc = await getDoc(bancoRef);
+        let saldoActual = 0;
+
+        if (bancoDoc.exists()) {
+          saldoActual = bancoDoc.data().saldo || 0;
+        }
+
+        const nuevoSaldo = saldoActual - data.monto;
+
         const movimientoData = {
           folio: `MB-${Date.now()}`,
           fecha: Timestamp.fromDate(new Date(data.fecha)),
@@ -189,17 +242,28 @@ export const GastoForm = ({ onSuccess, onCancel, className = '' }) => {
           tipo: 'salida',
           categoria: 'gasto',
           monto: data.monto,
-          saldo: 0, // TODO: Calcular saldo actualizado
+          saldoAnterior: saldoActual,
+          saldo: nuevoSaldo,
           concepto: `GASTO: ${data.concepto}`,
           referencia: data.referencia || null,
           metodoPago: data.metodoPago,
-          gastoRelacionado: data.folio,
+          relacionadoCon: 'gasto',
+          relacionadoId: gastoRef.id,
           notas: data.notas || null,
           createdAt: Timestamp.now(),
-          createdBy: 'current-user',
+          createdBy: user?.uid || 'system',
+          createdByName: userData?.displayName || 'Sistema',
         };
 
         await addDoc(collection(db, 'movimientosBancarios'), movimientoData);
+
+        // Update bank balance
+        if (bancoDoc.exists()) {
+          await updateDoc(bancoRef, {
+            saldo: nuevoSaldo,
+            updatedAt: Timestamp.now(),
+          });
+        }
       }
 
       toast.success('Gasto registrado exitosamente');

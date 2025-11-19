@@ -35,6 +35,7 @@ import PropTypes from 'prop-types';
 import { z } from 'zod';
 
 import { Spinner } from '../components/animations/AnimationSystem';
+import { useAuth } from '../components/auth';
 import { Alert, useToast } from '../components/feedback/FeedbackComponents';
 import { Button } from '../components/ui/BaseComponents';
 import {
@@ -88,6 +89,7 @@ export const PagoDeudaForm = ({ compraIdProp = null, onSuccess, onCancel, classN
   const [compraSeleccionada, setCompraSeleccionada] = useState(null);
   const toast = useToast();
   const db = getFirestore();
+  const { user, userData } = useAuth();
 
   const {
     register,
@@ -195,6 +197,16 @@ export const PagoDeudaForm = ({ compraIdProp = null, onSuccess, onCancel, classN
 
       // Crear movimiento bancario
       if (data.metodoPago === 'transferencia' && data.banco) {
+        const bancoRef = doc(db, 'bancos', data.banco);
+        const bancoDoc = await getDoc(bancoRef);
+        let saldoActual = 0;
+
+        if (bancoDoc.exists()) {
+          saldoActual = bancoDoc.data().saldo || 0;
+        }
+
+        const nuevoSaldo = saldoActual - data.monto;
+
         await addDoc(collection(db, 'movimientosBancarios'), {
           folio: `MB-${Date.now()}`,
           fecha: Timestamp.now(),
@@ -202,15 +214,27 @@ export const PagoDeudaForm = ({ compraIdProp = null, onSuccess, onCancel, classN
           tipo: 'salida',
           categoria: 'compra',
           monto: data.monto,
-          saldo: 0,
+          saldoAnterior: saldoActual,
+          saldo: nuevoSaldo,
           concepto: `PAGO COMPRA: ${compraSeleccionada.folio}`,
           referencia: data.referencia || null,
           metodoPago: data.metodoPago,
-          compraRelacionada: compraSeleccionada.folio,
+          relacionadoCon: 'compra',
+          relacionadoId: data.compraId,
+          distribuidorId: compraSeleccionada.distribuidorId || null,
+          distribuidorNombre: compraSeleccionada.distribuidorNombre || null,
           notas: data.notas || null,
           createdAt: Timestamp.now(),
-          createdBy: 'current-user',
+          createdBy: user?.uid || 'system',
+          createdByName: userData?.displayName || 'Sistema',
         });
+
+        if (bancoDoc.exists()) {
+          await updateDoc(bancoRef, {
+            saldo: nuevoSaldo,
+            updatedAt: Timestamp.now(),
+          });
+        }
       }
 
       toast.success('Pago registrado exitosamente');

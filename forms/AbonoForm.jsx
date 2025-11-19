@@ -21,6 +21,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Timestamp,
+  addDoc,
   collection,
   doc,
   getDoc,
@@ -36,6 +37,7 @@ import { z } from 'zod';
 
 // Components
 import { Spinner } from '../components/animations/AnimationSystem';
+import { useAuth } from '../components/auth';
 import { Alert, useToast } from '../components/feedback/FeedbackComponents';
 import { Button } from '../components/ui/BaseComponents';
 import {
@@ -111,6 +113,7 @@ export const AbonoForm = ({ ventaIdProp = null, onSuccess, onCancel, className =
   const [ventaSeleccionada, setVentaSeleccionada] = useState(null);
   const toast = useToast();
   const db = getFirestore();
+  const { user, userData } = useAuth();
 
   // React Hook Form
   const {
@@ -265,8 +268,24 @@ export const AbonoForm = ({ ventaIdProp = null, onSuccess, onCancel, className =
 
       // Crear movimiento bancario si aplica
       if (data.metodoPago === 'transferencia' && data.banco) {
-        // TODO: Crear movimiento bancario
-        // await addDoc(collection(db, 'movimientosBancarios'), { ... });
+        const movimientoData = {
+          fecha: Timestamp.now(),
+          banco: data.banco,
+          tipo: 'ingreso',
+          monto: data.monto,
+          concepto: `Abono a venta ${ventaSeleccionada.folio}`,
+          categoria: 'venta',
+          referencia: data.referencia || null,
+          relacionadoCon: 'venta',
+          relacionadoId: data.ventaId,
+          clienteId: ventaSeleccionada.clienteId || null,
+          clienteNombre: ventaSeleccionada.clienteNombre || null,
+          notas: data.notas || null,
+          createdAt: Timestamp.now(),
+          createdBy: user?.uid || 'system',
+          createdByName: userData?.displayName || 'Sistema',
+        };
+        await addDoc(collection(db, 'movimientosBancarios'), movimientoData);
       }
 
       toast.success('Abono registrado exitosamente');

@@ -35,6 +35,7 @@ import { z } from 'zod';
 
 // Components
 import { Spinner } from '../components/animations/AnimationSystem';
+import { useAuth } from '../components/auth';
 import { Alert, useToast } from '../components/feedback/FeedbackComponents';
 import { Button } from '../components/ui/BaseComponents';
 import { FormInput, FormSelect, FormTextarea } from '../components/ui/FormComponents';
@@ -96,6 +97,7 @@ export const LiquidarVentaForm = ({ ventaIdProp = null, onSuccess, onCancel, cla
   const [ventaSeleccionada, setVentaSeleccionada] = useState(null);
   const toast = useToast();
   const db = getFirestore();
+  const { user, userData } = useAuth();
 
   const {
     register,
