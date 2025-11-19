@@ -18,8 +18,6 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
-import PropTypes from 'prop-types';
-
 import { Spinner } from '../components/animations/AnimationSystem';
 import { PageLayout } from '../components/layout/LayoutComponents';
 
@@ -64,10 +62,6 @@ const ProtectedRoute = ({ children }) => {
   }
 
   return children;
-};
-
-ProtectedRoute.propTypes = {
-  children: PropTypes.node.isRequired,
 };
 
 // ============================================================================
